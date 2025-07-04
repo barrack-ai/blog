@@ -1,0 +1,135 @@
+/**
+ * Barrack.ai Dark Theme
+ * Black backgrounds with #e0eacc accent color
+ */
+
+:root {
+  --ifm-color-primary: #e0eacc;
+  --ifm-color-primary-dark: #c8d9a9;
+  --ifm-color-primary-darker: #b8cc96;
+  --ifm-color-primary-darkest: #9bb470;
+  --ifm-color-primary-light: #e8f0d6;
+  --ifm-color-primary-lighter: #edf3df;
+  --ifm-color-primary-lightest: #f6f9f0;
+  --ifm-code-font-size: 95%;
+  
+  /* Dark theme colors */
+  --ifm-background-color: #000000;
+  --ifm-background-surface-color: #111111;
+  --ifm-color-content: #ffffff;
+  --ifm-color-content-secondary: #cccccc;
+  --ifm-font-color-base: #ffffff;
+  --ifm-font-color-secondary: #cccccc;
+  
+  /* Navigation */
+  --ifm-navbar-background-color: #000000;
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(224, 234, 204, 0.1);
+  
+  /* Footer */
+  --ifm-footer-background-color: #000000;
+  --ifm-footer-color: #cccccc;
+  --ifm-footer-link-color: #e0eacc;
+  --ifm-footer-title-color: #ffffff;
+  
+  /* Cards and containers */
+  --ifm-card-background-color: #111111;
+  --ifm-hover-overlay: rgba(224, 234, 204, 0.05);
+  
+  /* Links */
+  --ifm-link-color: #e0eacc;
+  --ifm-link-hover-color: #c8d9a9;
+  
+  /* Borders */
+  --ifm-color-emphasis-300: #333333;
+  --ifm-color-emphasis-500: #555555;
+  --ifm-hr-background-color: #333333;
+  
+  /* Code blocks */
+  --ifm-code-background: #1a1a1a;
+  --ifm-pre-background: #1a1a1a;
+  --ifm-blockquote-border-left-color: #e0eacc;
+  
+  /* Alerts */
+  --ifm-alert-background-color: #1a1a1a;
+  --ifm-alert-border-color: #333333;
+  
+  /* Buttons */
+  --ifm-button-background-color: #e0eacc;
+  --ifm-button-color: #000000;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #e0eacc;
+  --ifm-color-primary-dark: #c8d9a9;
+  --ifm-color-primary-darker: #b8cc96;
+  --ifm-color-primary-darkest: #9bb470;
+  --ifm-color-primary-light: #e8f0d6;
+  --ifm-color-primary-lighter: #edf3df;
+  --ifm-color-primary-lightest: #f6f9f0;
+}
+
+/* Global styles */
+html {
+  background-color: #000000;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Navigation bar */
+.navbar {
+  background-color: #000000 !important;
+  border-bottom: 1px solid #333333;
+}
+
+.navbar__title {
+  color: #e0eacc !important;
+  font-weight: 700;
+  font-size: 1.5em !important;
+}
+
+.navbar__item--show-mobile .navbar__link {
+  color: #ffffff !important;
+}
+
+.navbar__link {
+  color: #ffffff !important;
+}
+
+.navbar__link:hover {
+  color: #e0eacc !important;
+}
+
+/* Blog posts */
+.blog-wrapper {
+  background-color: #000000;
+}
+
+.theme-blog-list-page-main {
+  background-color: #000000;
+}
+
+/* Footer */
+.footer {
+  background-color: #000000 !important;
+  border-top: 1px solid #333333;
+  color: #cccccc;
+}
+
+.footer__title {
+  color: #ffffff;
+}
+
+.footer__link-item {
+  color: #cccccc;
+}
+
+.footer__link-item:hover {
+  color: #e0eacc;
+}
+
+.footer__copyright {
+  color: #888888;
+}
