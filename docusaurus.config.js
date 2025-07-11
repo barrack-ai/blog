@@ -129,7 +129,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Barrack.ai. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Barrack.ai.`,
       },
       prism: {
         theme: prismThemes.github,
