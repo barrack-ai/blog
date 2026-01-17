@@ -69,7 +69,6 @@ export default function NavbarContent() {
   const [leftItems, rightItems] = splitNavbarItems(items);
   const searchBarItem = items.find((item) => item.type === 'search');
   
-  // Separate text links from Deploy button
   const textLinks = rightItems.filter(item => item.label !== 'Deploy');
   const deployButton = rightItems.filter(item => item.label === 'Deploy');
   
@@ -84,7 +83,7 @@ export default function NavbarContent() {
       }
       right={
         <>
-          <div style={{marginRight: '378px'}}>
+          <div style={{position: 'relative', right: '378px'}}>
             <NavbarItems items={textLinks} />
           </div>
           <NavbarColorModeToggle className={styles.colorModeToggle} />
