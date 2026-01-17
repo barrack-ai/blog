@@ -93,10 +93,6 @@ const config = {
       position: 'left',
     },
     {
-      href: 'https://github.com/barrack-ai',
-      label: 'GitHub',
-      position: 'right',
-    },
   ],
 },
       footer: {
