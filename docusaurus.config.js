@@ -5,7 +5,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 const config = {
   title: 'Barrack.ai',
   tagline: 'Personalized GPU Computing for AI Workloads',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.jpg',
 
   // Set the production url of your site here
   url: 'https://blog.barrack.ai',
