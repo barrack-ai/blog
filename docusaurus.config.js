@@ -55,7 +55,7 @@ const config = {
     },
     footer: {
       style: 'light',
-      copyright: `Copyright © ${new Date().getFullYear()} Barrack.ai.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Barrack.ai. All rights reserved.`,
     },
     prism: {
       theme: prismThemes.github,
