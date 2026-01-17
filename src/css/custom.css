@@ -51,8 +51,18 @@ html, body, .main-wrapper {
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
 }
 
+/* Hide hamburger menu on desktop */
+.navbar__toggle {
+  display: none !important;
+}
+
 .navbar__logo {
   display: none !important;
+}
+
+/* Left side - Logo/Brand */
+.navbar__brand {
+  margin-right: auto !important;
 }
 
 .navbar__title {
@@ -70,14 +80,14 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
+/* Left container - brand + nav links */
 .navbar__items:not(.navbar__items--right) {
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  flex: 1 !important;
+  justify-content: flex-start !important;
   gap: 40px !important;
-  margin: 0 !important;
 }
 
+/* Nav links styling */
 .navbar__link {
   font-family: 'Inter', sans-serif !important;
   font-size: 16px !important;
@@ -97,29 +107,31 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
-/* Right side - use flexbox order to reposition */
+/* Right container */
 .navbar__items--right {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
+  flex-direction: row !important;
 }
 
-/* Theme toggle comes first (order 1) */
+/* Theme toggle - order 1 */
 .navbar__items--right > div[class*="colorModeToggle"],
 .navbar__items--right > div[class*="toggle_"] {
   order: 1 !important;
 }
 
-/* Deploy button comes second (order 2) */
-.navbar__items--right > .navbar-deploy-button {
+/* Deploy button - order 2 */
+.navbar__items--right > a.navbar-deploy-button {
   order: 2 !important;
 }
 
-/* Search container last (order 3) */
+/* Search container - order 3 */
 .navbar__items--right > div[class*="navbarSearchContainer"] {
   order: 3 !important;
 }
 
+/* Deploy button styling */
 .navbar-deploy-button {
   background-color: #1a1a1a !important;
   color: #ffffff !important;
