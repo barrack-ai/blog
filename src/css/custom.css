@@ -40,6 +40,9 @@ html, body, .main-wrapper {
   margin: 0 auto;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 [data-theme='dark'] .navbar > .navbar__inner {
@@ -48,12 +51,18 @@ html, body, .main-wrapper {
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
 }
 
+/* Hide hamburger menu on desktop */
 .navbar__toggle {
   display: none !important;
 }
 
 .navbar__logo {
   display: none !important;
+}
+
+/* Left side - Logo/Brand */
+.navbar__brand {
+  margin-right: auto !important;
 }
 
 .navbar__title {
@@ -71,6 +80,14 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
+/* Left container - brand + nav links */
+.navbar__items:not(.navbar__items--right) {
+  flex: 1 !important;
+  justify-content: flex-start !important;
+  gap: 40px !important;
+}
+
+/* Nav links styling */
 .navbar__link {
   font-family: 'Inter', sans-serif !important;
   font-size: 16px !important;
@@ -90,16 +107,28 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
-/* Right side - all items with flex */
+/* Right container */
 .navbar__items--right {
   display: flex !important;
   align-items: center !important;
-  gap: 40px !important;
+  gap: 16px !important;
+  flex-direction: row !important;
 }
 
-/* Hide search */
+/* Theme toggle - order 1 */
+.navbar__items--right > div[class*="colorModeToggle"],
+.navbar__items--right > div[class*="toggle_"] {
+  order: 1 !important;
+}
+
+/* Deploy button - order 2 */
+.navbar__items--right > a.navbar-deploy-button {
+  order: 2 !important;
+}
+
+/* Search container - order 3 */
 .navbar__items--right > div[class*="navbarSearchContainer"] {
-  display: none !important;
+  order: 3 !important;
 }
 
 /* Deploy button styling */
@@ -122,3 +151,4 @@ html, body, .main-wrapper {
 [data-theme='dark'] .clean-btn {
   color: #cad9e3 !important;
 }
+
