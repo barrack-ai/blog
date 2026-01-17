@@ -432,3 +432,11 @@ img.avatar__photo {
 [data-theme='light'] *::-webkit-scrollbar-thumb:hover {
   background: #bbb;
 }
+
+/* Hide theme toggle from mobile navbar - keep only in hamburger */
+@media (max-width: 996px) {
+  .navbar__items--right > div[class*="colorModeToggle"],
+  .navbar__items--right > div[class*="toggle_"] {
+    display: none !important;
+  }
+}
