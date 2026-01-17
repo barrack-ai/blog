@@ -122,3 +122,171 @@ html, body, .main-wrapper {
 .navbar__items--right > div:first-child a.navbar__link:last-of-type {
   margin-left: 19px !important;
 }
+
+/* Remove green from links - light mode */
+.sidebarItemLink,
+.sidebarItemLink:hover,
+a.tag_zVej,
+a.tag_zVej:hover,
+.pagination-nav__link,
+.pagination-nav__link:hover,
+footer a,
+footer a:hover,
+article a:not(.avatar__photo-link),
+.read-more a,
+a[class*="readMore"],
+.col.text--right a,
+.col.text--right a:hover {
+  color: #444 !important;
+}
+
+/* Remove green from links - dark mode */
+[data-theme='dark'] .sidebarItemLink,
+[data-theme='dark'] .sidebarItemLink:hover,
+[data-theme='dark'] a.tag_zVej,
+[data-theme='dark'] a.tag_zVej:hover,
+[data-theme='dark'] .pagination-nav__link,
+[data-theme='dark'] .pagination-nav__link:hover,
+[data-theme='dark'] footer a,
+[data-theme='dark'] footer a:hover,
+[data-theme='dark'] article a:not(.avatar__photo-link),
+[data-theme='dark'] .read-more a,
+[data-theme='dark'] a[class*="readMore"],
+[data-theme='dark'] .col.text--right a,
+[data-theme='dark'] .col.text--right a:hover {
+  color: #cad9e3 !important;
+}
+
+/* Blog post title - no green */
+article h2 a,
+article h2 a:hover,
+h2.title_f1Hy a,
+h2.title_f1Hy a:hover {
+  color: #1a1a1a !important;
+}
+
+[data-theme='dark'] article h2 a,
+[data-theme='dark'] article h2 a:hover,
+[data-theme='dark'] h2.title_f1Hy a,
+[data-theme='dark'] h2.title_f1Hy a:hover {
+  color: #ffffff !important;
+}
+
+/* Sidebar links - no green */
+.sidebar_re4s a,
+.sidebar_re4s a:hover,
+nav[aria-label*="Blog"] a,
+nav[aria-label*="Blog"] a:hover {
+  color: #444 !important;
+}
+
+[data-theme='dark'] .sidebar_re4s a,
+[data-theme='dark'] .sidebar_re4s a:hover,
+[data-theme='dark'] nav[aria-label*="Blog"] a,
+[data-theme='dark'] nav[aria-label*="Blog"] a:hover {
+  color: #cad9e3 !important;
+}
+
+/* Tags border and text */
+a.tag_zVej {
+  border-color: #ddd !important;
+}
+
+[data-theme='dark'] a.tag_zVej {
+  border-color: #333 !important;
+}
+
+/* Keep author name green */
+.avatar__name a,
+.avatar__name a:hover {
+  color: #2e8555 !important;
+}
+
+[data-theme='dark'] .avatar__name a,
+[data-theme='dark'] .avatar__name a:hover {
+  color: #4ADE80 !important;
+}
+
+/* Remove green from links - light mode */
+.sidebarItemLink,
+.sidebarItemLink:hover,
+a.tag_zVej,
+a.tag_zVej:hover,
+.pagination-nav__link,
+.pagination-nav__link:hover,
+footer a,
+footer a:hover,
+article a:not(.avatar__photo-link),
+.read-more a,
+a[class*="readMore"],
+.col.text--right a,
+.col.text--right a:hover {
+  color: #444 !important;
+}
+
+/* Remove green from links - dark mode */
+[data-theme='dark'] .sidebarItemLink,
+[data-theme='dark'] .sidebarItemLink:hover,
+[data-theme='dark'] a.tag_zVej,
+[data-theme='dark'] a.tag_zVej:hover,
+[data-theme='dark'] .pagination-nav__link,
+[data-theme='dark'] .pagination-nav__link:hover,
+[data-theme='dark'] footer a,
+[data-theme='dark'] footer a:hover,
+[data-theme='dark'] article a:not(.avatar__photo-link),
+[data-theme='dark'] .read-more a,
+[data-theme='dark'] a[class*="readMore"],
+[data-theme='dark'] .col.text--right a,
+[data-theme='dark'] .col.text--right a:hover {
+  color: #cad9e3 !important;
+}
+
+/* Blog post title - no green */
+article h2 a,
+article h2 a:hover,
+h2.title_f1Hy a,
+h2.title_f1Hy a:hover {
+  color: #1a1a1a !important;
+}
+
+[data-theme='dark'] article h2 a,
+[data-theme='dark'] article h2 a:hover,
+[data-theme='dark'] h2.title_f1Hy a,
+[data-theme='dark'] h2.title_f1Hy a:hover {
+  color: #ffffff !important;
+}
+
+/* Sidebar links - no green */
+.sidebar_re4s a,
+.sidebar_re4s a:hover,
+nav[aria-label*="Blog"] a,
+nav[aria-label*="Blog"] a:hover {
+  color: #444 !important;
+}
+
+[data-theme='dark'] .sidebar_re4s a,
+[data-theme='dark'] .sidebar_re4s a:hover,
+[data-theme='dark'] nav[aria-label*="Blog"] a,
+[data-theme='dark'] nav[aria-label*="Blog"] a:hover {
+  color: #cad9e3 !important;
+}
+
+/* Tags border and text */
+a.tag_zVej {
+  border-color: #ddd !important;
+}
+
+[data-theme='dark'] a.tag_zVej {
+  border-color: #333 !important;
+}
+
+/* Keep author name green */
+.avatar__name a,
+.avatar__name a:hover {
+  color: #2e8555 !important;
+}
+
+[data-theme='dark'] .avatar__name a,
+[data-theme='dark'] .avatar__name a:hover {
+  color: #4ADE80 !important;
+}
