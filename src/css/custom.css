@@ -140,3 +140,7 @@ html, body, .main-wrapper {
 [data-theme='dark'] .clean-btn {
   color: #cad9e3 !important;
 }
+
+.navbar__items--right {
+  margin-right: 378px !important;
+}
