@@ -140,3 +140,13 @@ html, body, .main-wrapper {
 [data-theme='dark'] .clean-btn {
   color: #cad9e3 !important;
 }
+
+/* Docs - move 0.5cm (19px) to the left */
+.navbar__items--right > div:first-child a.navbar__link:first-of-type {
+  margin-right: 19px !important;
+}
+
+/* Signup - move 0.5cm (19px) to the right */
+.navbar__items--right > div:first-child a.navbar__link:last-of-type {
+  margin-left: 19px !important;
+}
