@@ -40,9 +40,6 @@ html, body, .main-wrapper {
   margin: 0 auto;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   height: 50px;
-  display: grid !important;
-  grid-template-columns: 1fr auto 1fr !important;
-  align-items: center !important;
 }
 
 [data-theme='dark'] .navbar > .navbar__inner {
@@ -74,50 +71,6 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
-/* Left - Brand only */
-.navbar__items:not(.navbar__items--right) {
-  justify-self: start !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 40px !important;
-}
-
-/* Hide links from left, show only brand */
-.navbar__items:not(.navbar__items--right) .navbar__link {
-  display: none !important;
-}
-
-/* Center - Docs, Pricing, Signup, Toggle */
-.navbar__items--right {
-  justify-self: center !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 40px !important;
-}
-
-/* Show the non-deploy links */
-.navbar__items--right .navbar__link:not(.navbar-deploy-button) {
-  display: flex !important;
-}
-
-/* Deploy button - needs to be far right */
-.navbar-deploy-button {
-  position: absolute !important;
-  right: 40px !important;
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
-  border-radius: 20px !important;
-  padding: 10px 24px !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-}
-
-[data-theme='dark'] .navbar-deploy-button {
-  background-color: #ffffff !important;
-  color: #2a2828 !important;
-}
-
 .navbar__link {
   font-family: 'Inter', sans-serif !important;
   font-size: 16px !important;
@@ -137,9 +90,32 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
+/* Right side - all items with flex */
+.navbar__items--right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 40px !important;
+}
+
 /* Hide search */
 .navbar__items--right > div[class*="navbarSearchContainer"] {
   display: none !important;
+}
+
+/* Deploy button styling */
+.navbar-deploy-button {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-radius: 20px !important;
+  padding: 10px 24px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+[data-theme='dark'] .navbar-deploy-button {
+  background-color: #ffffff !important;
+  color: #2a2828 !important;
 }
 
 [data-theme='dark'] button[class*="toggle"],
