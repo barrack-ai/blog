@@ -391,3 +391,44 @@ img.avatar__photo {
     display: none !important;
   }
 }
+
+/* Custom scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #555 #2a2a2a;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Light mode scrollbar */
+[data-theme='light'] * {
+  scrollbar-color: #ccc #f0f0f0;
+}
+
+[data-theme='light'] *::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+[data-theme='light'] *::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+
+[data-theme='light'] *::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}
