@@ -42,9 +42,9 @@ const config = {
         href: 'https://barrack.ai',
       },
       items: [
-        {href: 'https://docs.barrack.ai', label: 'Docs', position: 'left'},
-        {href: 'https://barrack.ai/pricing', label: 'Pricing', position: 'left'},
-        {href: 'https://barrack.ai/signup', label: 'Signup', position: 'left'},
+        {href: 'https://docs.barrack.ai', label: 'Docs', position: 'right'},
+        {href: 'https://barrack.ai/pricing', label: 'Pricing', position: 'right'},
+        {href: 'https://barrack.ai/signup', label: 'Signup', position: 'right'},
         {
           href: 'https://barrack.ai/deploy',
           label: 'Deploy',
