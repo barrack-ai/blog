@@ -5,7 +5,7 @@
 }
 [data-theme='dark'] {
   --ifm-color-primary: #4ADE80;
-  --ifm-background-color: #000000;
+  --ifm-background-color: #0f0f0f;
 }
 html, body, .main-wrapper {
   background-color: var(--ifm-background-color) !important;
@@ -13,7 +13,7 @@ html, body, .main-wrapper {
 [data-theme='dark'] html,
 [data-theme='dark'] body,
 [data-theme='dark'] .main-wrapper {
-  background-color: #000000 !important;
+  background-color: #0f0f0f !important;
 }
 .navbar {
   background: #f5f5f5 !important;
@@ -22,7 +22,7 @@ html, body, .main-wrapper {
   height: auto !important;
 }
 [data-theme='dark'] .navbar {
-  background: #000000 !important;
+  background: #0f0f0f !important;
 }
 .navbar > .navbar__inner {
   background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
