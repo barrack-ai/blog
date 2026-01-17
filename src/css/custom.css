@@ -70,7 +70,6 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
-/* Center items - Docs, Pricing, Signup + toggle */
 .navbar__items:not(.navbar__items--right) {
   position: absolute !important;
   left: 50% !important;
@@ -98,22 +97,19 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
-/* Move theme toggle to center group */
 .navbar__items--right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
 }
 
-/* Theme toggle styling */
-.navbar__items--right > div:first-child {
-  position: absolute !important;
-  left: 50% !important;
-  transform: translateX(calc(-50% + 200px)) !important;
+.navbar__items--right > div[class*="toggle"],
+.navbar__items--right > div:has(button[class*="toggle"]) {
+  order: 1 !important;
 }
 
-/* Deploy button - far right */
 .navbar-deploy-button {
+  order: 2 !important;
   background-color: #1a1a1a !important;
   color: #ffffff !important;
   border-radius: 20px !important;
