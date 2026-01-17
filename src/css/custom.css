@@ -307,16 +307,54 @@ img.avatar__photo {
 }
 
 
+
 /* ===== MOBILE ONLY - Does not affect desktop ===== */
 @media (max-width: 996px) {
-  /* Show hamburger menu on mobile */
+  /* Rearrange navbar: Logo left, hamburger right */
+  .navbar__inner {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+  }
+  
+  /* Move hamburger to right side */
   .navbar__toggle {
     display: flex !important;
     color: #1a1a1a !important;
+    order: 10 !important;
+    position: absolute !important;
+    right: 16px !important;
   }
   
   [data-theme='dark'] .navbar__toggle {
     color: #cad9e3 !important;
+  }
+  
+  /* Keep Deploy button visible in navbar on mobile */
+  .navbar-deploy-button {
+    display: flex !important;
+    order: 9 !important;
+    position: absolute !important;
+    right: 56px !important;
+  }
+  
+  /* Keep theme toggle visible on mobile */
+  .navbar__items--right > div[class*="colorModeToggle"],
+  .navbar__items--right > div[class*="toggle_"] {
+    display: flex !important;
+    order: 8 !important;
+    position: absolute !important;
+    right: 160px !important;
+  }
+  
+  /* Hide nav links on mobile (they go in hamburger) */
+  .navbar__items:not(.navbar__items--right) .navbar__link:not(.navbar-deploy-button) {
+    display: none !important;
+  }
+  
+  /* Hide external link arrows in mobile sidebar */
+  .navbar-sidebar .menu__link svg,
+  .navbar-sidebar a svg {
+    display: none !important;
   }
   
   /* Mobile sidebar background */
@@ -328,7 +366,7 @@ img.avatar__photo {
     background: #000 !important;
   }
   
-  /* Mobile sidebar links */
+  /* Mobile sidebar links styling */
   .navbar-sidebar .menu__link {
     color: #1a1a1a !important;
     padding: 14px 20px !important;
@@ -346,5 +384,10 @@ img.avatar__photo {
   
   [data-theme='dark'] .navbar-sidebar .menu__link:hover {
     background: rgba(255,255,255,0.05) !important;
+  }
+  
+  /* Hide Deploy from hamburger menu (it's already in navbar) */
+  .navbar-sidebar .navbar-deploy-button {
+    display: none !important;
   }
 }
