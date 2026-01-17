@@ -41,6 +41,8 @@ html, body, .main-wrapper {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   height: 50px;
   position: relative !important;
+  display: flex !important;
+  align-items: center !important;
 }
 
 [data-theme='dark'] .navbar > .navbar__inner {
@@ -72,57 +74,44 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
-/* Left side - just the brand */
+/* Left container - just brand */
 .navbar__items:not(.navbar__items--right) {
-  position: absolute !important;
-  left: 40px !important;
-  display: flex !important;
-  align-items: center !important;
-  height: 100% !important;
+  flex: 0 0 auto !important;
 }
 
-/* Hide the nav links from left container - we'll reposition them */
-.navbar__items:not(.navbar__items--right) .navbar__link:not(.navbar__brand *) {
-  display: none !important;
-}
-
-/* Right side */
-.navbar__items--right {
+/* Center the Docs, Pricing, Signup links using absolute positioning */
+.navbar__items:not(.navbar__items--right) .navbar__link {
   position: absolute !important;
-  right: 40px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   display: flex !important;
-  align-items: center !important;
-  height: 100% !important;
   gap: 40px !important;
 }
 
-/* Move Docs, Pricing, Signup, Toggle to center */
-.navbar__items--right .navbar__link:not(.navbar-deploy-button) {
-  /* These are now in center */
+/* Target each link individually and position them as a group */
+.navbar__link[href*="docs.barrack"] {
+  position: absolute !important;
+  left: calc(50% - 120px) !important;
+  transform: none !important;
 }
 
-/* Theme toggle stays with center group */
+.navbar__link[href*="/pricing"] {
+  position: absolute !important;
+  left: calc(50% - 20px) !important;
+  transform: none !important;
+}
+
+.navbar__link[href*="/signup"] {
+  position: absolute !important;
+  left: calc(50% + 70px) !important;
+  transform: none !important;
+}
+
+/* Theme toggle - position after Signup */
 .navbar__items--right > div[class*="colorModeToggle"],
 .navbar__items--right > div[class*="toggle_"] {
-  order: 0 !important;
-}
-
-/* Deploy button stays far right */
-.navbar-deploy-button {
-  order: 99 !important;
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
-  border-radius: 20px !important;
-  padding: 10px 24px !important;
-  font-family: 'Inter', sans-serif !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  margin-left: auto !important;
-}
-
-[data-theme='dark'] .navbar-deploy-button {
-  background-color: #ffffff !important;
-  color: #2a2828 !important;
+  position: absolute !important;
+  left: calc(50% + 160px) !important;
 }
 
 .navbar__link {
@@ -144,9 +133,33 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
+/* Right container */
+.navbar__items--right {
+  position: absolute !important;
+  right: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 100% !important;
+}
+
 /* Hide search */
 .navbar__items--right > div[class*="navbarSearchContainer"] {
   display: none !important;
+}
+
+.navbar-deploy-button {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-radius: 20px !important;
+  padding: 10px 24px !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+[data-theme='dark'] .navbar-deploy-button {
+  background-color: #ffffff !important;
+  color: #2a2828 !important;
 }
 
 [data-theme='dark'] button[class*="toggle"],
