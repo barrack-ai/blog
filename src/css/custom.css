@@ -40,9 +40,9 @@ html, body, .main-wrapper {
   margin: 0 auto;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   height: 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
 }
 
 [data-theme='dark'] .navbar > .navbar__inner {
@@ -51,18 +51,12 @@ html, body, .main-wrapper {
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
 }
 
-/* Hide hamburger menu on desktop */
 .navbar__toggle {
   display: none !important;
 }
 
 .navbar__logo {
   display: none !important;
-}
-
-/* Left side - Logo/Brand */
-.navbar__brand {
-  margin-right: auto !important;
 }
 
 .navbar__title {
@@ -80,14 +74,14 @@ html, body, .main-wrapper {
   color: #fff !important;
 }
 
-/* Left container - brand + nav links */
+/* Left container - just the brand */
 .navbar__items:not(.navbar__items--right) {
-  flex: 1 !important;
-  justify-content: flex-start !important;
+  display: flex !important;
+  align-items: center !important;
   gap: 40px !important;
+  justify-content: center !important;
 }
 
-/* Nav links styling */
 .navbar__link {
   font-family: 'Inter', sans-serif !important;
   font-size: 16px !important;
@@ -111,27 +105,22 @@ html, body, .main-wrapper {
 .navbar__items--right {
   display: flex !important;
   align-items: center !important;
-  gap: 16px !important;
-  flex-direction: row !important;
+  justify-content: flex-end !important;
 }
 
-/* Theme toggle - order 1 */
+/* Hide the theme toggle from right side - we'll show it differently */
 .navbar__items--right > div[class*="colorModeToggle"],
 .navbar__items--right > div[class*="toggle_"] {
-  order: 1 !important;
+  position: absolute !important;
+  left: 50% !important;
+  transform: translateX(calc(-50% + 180px)) !important;
 }
 
-/* Deploy button - order 2 */
-.navbar__items--right > a.navbar-deploy-button {
-  order: 2 !important;
-}
-
-/* Search container - order 3 */
+/* Hide search */
 .navbar__items--right > div[class*="navbarSearchContainer"] {
-  order: 3 !important;
+  display: none !important;
 }
 
-/* Deploy button styling */
 .navbar-deploy-button {
   background-color: #1a1a1a !important;
   color: #ffffff !important;
