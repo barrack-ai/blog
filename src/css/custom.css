@@ -97,19 +97,30 @@ html, body, .main-wrapper {
   display: none !important;
 }
 
+/* Right side - use flexbox order to reposition */
 .navbar__items--right {
   display: flex !important;
   align-items: center !important;
   gap: 16px !important;
 }
 
-.navbar__items--right > div[class*="toggle"],
-.navbar__items--right > div:has(button[class*="toggle"]) {
+/* Theme toggle comes first (order 1) */
+.navbar__items--right > div[class*="colorModeToggle"],
+.navbar__items--right > div[class*="toggle_"] {
   order: 1 !important;
 }
 
-.navbar-deploy-button {
+/* Deploy button comes second (order 2) */
+.navbar__items--right > .navbar-deploy-button {
   order: 2 !important;
+}
+
+/* Search container last (order 3) */
+.navbar__items--right > div[class*="navbarSearchContainer"] {
+  order: 3 !important;
+}
+
+.navbar-deploy-button {
   background-color: #1a1a1a !important;
   color: #ffffff !important;
   border-radius: 20px !important;
