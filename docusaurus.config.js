@@ -100,7 +100,7 @@ const config = {
   ],
 },
       footer: {
-        style: 'dark',
+        style: 'light',
         links: [
           {
             title: 'Platform',
@@ -136,7 +136,7 @@ const config = {
         darkTheme: prismThemes.dracula,
       },
       colorMode: {
-        defaultMode: 'dark',
+        defaultMode: 'light',
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
