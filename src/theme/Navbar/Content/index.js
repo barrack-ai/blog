@@ -16,9 +16,11 @@ import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarLogo from '@theme/Navbar/Logo';
 import NavbarSearch from '@theme/Navbar/Search';
 import styles from './styles.module.css';
+
 function useNavbarItems() {
   return useThemeConfig().navbar.items;
 }
+
 function NavbarItems({items}) {
   return (
     <>
@@ -39,6 +41,7 @@ ${JSON.stringify(item, null, 2)}`,
     </>
   );
 }
+
 function NavbarContentLayout({left, right}) {
   return (
     <div className="navbar__inner">
@@ -59,11 +62,17 @@ function NavbarContentLayout({left, right}) {
     </div>
   );
 }
+
 export default function NavbarContent() {
   const mobileSidebar = useNavbarMobileSidebar();
   const items = useNavbarItems();
   const [leftItems, rightItems] = splitNavbarItems(items);
   const searchBarItem = items.find((item) => item.type === 'search');
+  
+  // Separate text links from Deploy button
+  const textLinks = rightItems.filter(item => item.label !== 'Deploy');
+  const deployButton = rightItems.filter(item => item.label === 'Deploy');
+  
   return (
     <NavbarContentLayout
       left={
@@ -75,8 +84,11 @@ export default function NavbarContent() {
       }
       right={
         <>
+          <div style={{marginRight: '378px'}}>
+            <NavbarItems items={textLinks} />
+          </div>
           <NavbarColorModeToggle className={styles.colorModeToggle} />
-          <NavbarItems items={rightItems} />
+          <NavbarItems items={deployButton} />
           {!searchBarItem && (
             <NavbarSearch>
               <SearchBar />
