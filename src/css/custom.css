@@ -290,3 +290,9 @@ a.tag_zVej {
 [data-theme='dark'] .avatar__name a:hover {
   color: #4ADE80 !important;
 }
+
+/* Reduce author avatar size */
+.avatar__photo {
+  width: 40px !important;
+  height: 40px !important;
+}
