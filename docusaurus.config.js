@@ -1,6 +1,5 @@
 // @ts-check
 import {themes as prismThemes} from 'prism-react-renderer';
-
 const config = {
   title: 'Barrack.ai',
   tagline: 'Personalized GPU Computing for AI Workloads',
@@ -37,10 +36,17 @@ const config = {
   themeConfig: ({
     navbar: {
       title: 'Barrack',
+      logo: {
+        alt: 'Barrack.ai',
+        src: 'img/logo.jpg',
+        href: 'https://barrack.ai',
+        target: '_self',
+      },
       items: [
-        {to: '/', label: 'Blog', position: 'left'},
-        {href: 'https://barrack.ai/deploy', label: 'Platform', position: 'left'},
         {href: 'https://docs.barrack.ai', label: 'Docs', position: 'left'},
+        {href: 'https://barrack.ai/pricing', label: 'Pricing', position: 'left'},
+        {href: 'https://barrack.ai/signup', label: 'Signup', position: 'left'},
+        {href: 'https://barrack.ai/deploy', label: 'Deploy', position: 'right'},
       ],
     },
     footer: {
@@ -58,5 +64,4 @@ const config = {
     },
   }),
 };
-
 module.exports = config;
