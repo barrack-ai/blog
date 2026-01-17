@@ -1,41 +1,22 @@
-# Website
+# Barrack.ai Blog
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+Official blog for [Barrack.ai](https://barrack.ai)
 
-## Installation
+🔗 **Live Site:** [blog.barrack.ai](https://blog.barrack.ai)
 
-```bash
-yarn
-```
+## About
 
-## Local Development
+Technical insights, guides, and updates on:
+- GPU computing and AI infrastructure
+- Platform updates and features
+- Cloud cost optimization
 
-```bash
-yarn start
-```
+## Links
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+- **Main Platform:** [barrack.ai](https://barrack.ai)
+- **API Documentation:** [docs.barrack.ai](https://docs.barrack.ai)
+- **Blog:** [blog.barrack.ai](https://blog.barrack.ai)
 
-## Build
+## License
 
-```bash
-yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Deployment
-
-Using SSH:
-
-```bash
-USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+© 2026 Barrack.ai. All rights reserved.
