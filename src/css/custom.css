@@ -334,7 +334,7 @@ img.avatar__photo {
     display: flex !important;
     order: 9 !important;
     position: absolute !important;
-    right: 56px !important;
+    right: 70px !important;
   }
   
   /* Keep theme toggle visible on mobile */
