@@ -440,3 +440,13 @@ img.avatar__photo {
     display: none !important;
   }
 }
+
+/* Keep Deploy button text color on hover - dark mode */
+[data-theme='dark'] .navbar-deploy-button:hover {
+  color: #2a2828 !important;
+}
+
+/* Keep Deploy button text color on hover - light mode */
+[data-theme='light'] .navbar-deploy-button:hover {
+  color: #ffffff !important;
+}
