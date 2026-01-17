@@ -1,6 +1,6 @@
-# Barrack.ai Blog
+# Barrack AI Blog
 
-Official blog for [Barrack.ai](https://barrack.ai)
+Official blog for [barrack.ai](https://barrack.ai)
 
 🔗 **Live Site:** [blog.barrack.ai](https://blog.barrack.ai)
 
@@ -19,4 +19,4 @@ Technical insights, guides, and updates on:
 
 ## License
 
-© 2026 Barrack.ai. All rights reserved.
+© 2026 Barrack AI All rights reserved.
