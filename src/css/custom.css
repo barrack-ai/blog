@@ -292,7 +292,7 @@ a.tag_zVej {
 }
 
 /* Reduce author avatar size */
-.avatar__photo {
+img.avatar__photo {
   width: 40px !important;
   height: 40px !important;
 }
