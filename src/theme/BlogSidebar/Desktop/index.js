@@ -7,7 +7,6 @@ import BlogSidebarContent from '@theme/BlogSidebar/Content';
 import styles from './styles.module.css';
 
 const ListComponent = ({items}) => {
-  console.log('Sidebar items:', items);
   return (
     <ul className={clsx(styles.sidebarItemList, 'clean-list')}>
       {items.map((item) => (
@@ -19,11 +18,11 @@ const ListComponent = ({items}) => {
             activeClassName={styles.sidebarItemLinkActive}>
             {item.title}
           </Link>
-          <span className={styles.sidebarItemMeta}>
-            {item.date && <span>{new Date(item.date).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}</span>}
-            {item.date && <span> · </span>}
-            <span>6 min read</span>
-          </span>
+          {item.date && (
+            <span className={styles.sidebarItemMeta}>
+              {new Date(item.date).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})} · 6 min read
+            </span>
+          )}
         </li>
       ))}
     </ul>
