@@ -83,7 +83,7 @@ export default function NavbarContent() {
       }
       right={
         <>
-          <div style={{position: 'relative', right: '378px'}}>
+          <div style={{position: 'relative', right: '321px'}}>
             <NavbarItems items={textLinks} />
           </div>
           <NavbarColorModeToggle className={styles.colorModeToggle} />
