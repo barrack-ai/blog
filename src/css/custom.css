@@ -61,7 +61,7 @@ html, body, .main-wrapper {
   font-family: 'Montserrat', sans-serif !important;
   font-weight: 700 !important;
   font-size: 26px !important;
-  color: #1a1a1a !important;
+  color: #2d2a2b !important;
 }
 [data-theme='dark'] .navbar__title {
   color: #cad9e3 !important;
@@ -171,7 +171,7 @@ article h2 a,
 article h2 a:hover,
 h2.title_f1Hy a,
 h2.title_f1Hy a:hover {
-  color: #1a1a1a !important;
+  color: #2d2a2b !important;
 }
 
 [data-theme='dark'] article h2 a,
@@ -255,7 +255,7 @@ article h2 a,
 article h2 a:hover,
 h2.title_f1Hy a,
 h2.title_f1Hy a:hover {
-  color: #1a1a1a !important;
+  color: #2d2a2b !important;
 }
 
 [data-theme='dark'] article h2 a,
@@ -319,7 +319,7 @@ img.avatar__photo {
   /* Move hamburger to right side */
   .navbar__toggle {
     display: flex !important;
-    color: #1a1a1a !important;
+    color: #2d2a2b !important;
     order: 10 !important;
     position: absolute !important;
     right: 16px !important;
@@ -368,7 +368,7 @@ img.avatar__photo {
   
   /* Mobile sidebar links styling */
   .navbar-sidebar .menu__link {
-    color: #1a1a1a !important;
+    color: #2d2a2b !important;
     padding: 14px 20px !important;
     font-size: 16px !important;
     font-weight: 500 !important;
