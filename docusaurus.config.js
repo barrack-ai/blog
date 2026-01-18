@@ -33,6 +33,15 @@ const config = {
       }),
     ],
   ],
+  plugins: [
+    [
+      '@docusaurus/plugin-google-gtag',
+      {
+        trackingID: 'G-FN4NDNRER9',
+        anonymizeIP: true,
+      },
+    ],
+  ],
   themeConfig: ({
     navbar: {
       title: 'Barrack',
