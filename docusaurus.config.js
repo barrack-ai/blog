@@ -1,5 +1,6 @@
 // @ts-check
 import {themes as prismThemes} from 'prism-react-renderer';
+
 const config = {
   title: 'Barrack.ai',
   tagline: 'Personalized GPU Computing for AI Workloads',
@@ -10,10 +11,17 @@ const config = {
   projectName: 'blog',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  // Delay-loaded analytics — no render-blocking gtag plugin
+  clientModules: [
+    './src/modules/delayedAnalytics.js',
+  ],
+
   presets: [
     [
       'classic',
@@ -30,18 +38,15 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
+        // gtag removed — loaded via clientModules with delay
+        gtag: false,
       }),
     ],
   ],
-  plugins: [
-    [
-      '@docusaurus/plugin-google-gtag',
-      {
-        trackingID: 'G-FN4NDNRER9',
-        anonymizeIP: true,
-      },
-    ],
-  ],
+
+  // No gtag plugin — handled by clientModules
+  plugins: [],
+
   themeConfig: ({
     navbar: {
       title: 'Barrack',
@@ -77,4 +82,5 @@ const config = {
     },
   }),
 };
+
 module.exports = config;

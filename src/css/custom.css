@@ -1,29 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Inter:wght@500;600&display=swap');
+@import url('@fontsource/montserrat/700.css');
+@import url('@fontsource/inter/500.css');
+@import url('@fontsource/inter/600.css');
+
+/* === Base colors === */
 :root {
   --ifm-color-primary: #2e8555;
   --ifm-background-color: #fdf8f8;
 }
+
 [data-theme='dark'] {
   --ifm-color-primary: #4ADE80;
   --ifm-background-color: #040911;
 }
+
 html, body, .main-wrapper {
   background-color: var(--ifm-background-color) !important;
 }
+
 [data-theme='dark'] html,
 [data-theme='dark'] body,
 [data-theme='dark'] .main-wrapper {
   background-color: #040911 !important;
 }
+
+/* === Navbar === */
 .navbar {
   background: #fdf8f8 !important;
   box-shadow: none !important;
   padding: 20px 16px 5px 16px !important;
   height: auto !important;
 }
+
 [data-theme='dark'] .navbar {
   background: #040911 !important;
 }
+
 .navbar > .navbar__inner {
   background: linear-gradient(145deg, #ffffff 0%, #fefafa 100%);
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -37,12 +48,13 @@ html, body, .main-wrapper {
   grid-template-columns: auto 1fr auto !important;
   align-items: center !important;
 }
+
 [data-theme='dark'] .navbar > .navbar__inner {
   background: linear-gradient(145deg, #040911 0%, #091423 100%);
   border: 1px solid rgba(202, 217, 227, 0.2);
   box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
 }
-/* Show hamburger on mobile */
+
 @media (max-width: 996px) {
   .navbar__toggle {
     display: flex !important;
@@ -54,58 +66,67 @@ html, body, .main-wrapper {
 .navbar__toggle {
   display: none !important;
 }
+
 .navbar__logo {
   display: none !important;
 }
+
 .navbar__title {
   font-family: 'Montserrat', sans-serif !important;
   font-weight: 700 !important;
   font-size: 26px !important;
   color: #2d2a2b !important;
 }
+
 [data-theme='dark'] .navbar__title {
   color: #cad9e3 !important;
 }
+
 [data-theme='dark'] .navbar__title:hover {
   color: #fff !important;
 }
-/* Left container - just the brand */
+
 .navbar__items:not(.navbar__items--right) {
   display: flex !important;
   align-items: center !important;
   gap: 40px !important;
   justify-content: center !important;
 }
+
 .navbar__link {
   font-family: 'Inter', sans-serif !important;
   font-size: 14.4px !important;
   font-weight: 500 !important;
   color: #555 !important;
 }
+
 [data-theme='dark'] .navbar__link {
   color: #cad9e3 !important;
 }
+
 [data-theme='dark'] .navbar__link:hover {
   color: #fff !important;
 }
+
 .navbar__link svg {
   display: none !important;
 }
-/* Right container */
+
 .navbar__items--right {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
 }
-/* Theme toggle - beside Deploy */
+
 .navbar__items--right > div[class*="colorModeToggle"],
 .navbar__items--right > div[class*="toggle_"] {
   margin-right: 16px !important;
 }
-/* Hide search */
+
 .navbar__items--right > div[class*="navbarSearchContainer"] {
   display: none !important;
 }
+
 .navbar-deploy-button {
   background-color: #1a1a1a !important;
   color: #ffffff !important;
@@ -115,24 +136,26 @@ html, body, .main-wrapper {
   font-size: 15px !important;
   font-weight: 600 !important;
 }
+
 [data-theme='dark'] .navbar-deploy-button {
   background-color: #ffffff !important;
   color: #2a2828 !important;
 }
+
 [data-theme='dark'] button[class*="toggle"],
 [data-theme='dark'] .clean-btn {
   color: #cad9e3 !important;
 }
-/* Docs - move 0.5cm (19px) to the left */
+
 .navbar__items--right > div:first-child a.navbar__link:first-of-type {
   margin-right: 19px !important;
 }
-/* Signup - move 0.5cm (19px) to the right */
+
 .navbar__items--right > div:first-child a.navbar__link:last-of-type {
   margin-left: 19px !important;
 }
 
-/* Remove green from links - light mode */
+/* === Links — no green (light) === */
 .sidebarItemLink,
 .sidebarItemLink:hover,
 a.tag_zVej,
@@ -149,7 +172,7 @@ a[class*="readMore"],
   color: #444 !important;
 }
 
-/* Remove green from links - dark mode */
+/* === Links — no green (dark) === */
 [data-theme='dark'] .sidebarItemLink,
 [data-theme='dark'] .sidebarItemLink:hover,
 [data-theme='dark'] a.tag_zVej,
@@ -166,37 +189,37 @@ a[class*="readMore"],
   color: #cad9e3 !important;
 }
 
-/* Blog post title - no green */
+/* === Blog post title — no green === */
 article h2 a,
 article h2 a:hover,
-h2.title_f1Hy a,
-h2.title_f1Hy a:hover {
+h2[class*="title"] a,
+h2[class*="title"] a:hover {
   color: #2d2a2b !important;
 }
 
 [data-theme='dark'] article h2 a,
 [data-theme='dark'] article h2 a:hover,
-[data-theme='dark'] h2.title_f1Hy a,
-[data-theme='dark'] h2.title_f1Hy a:hover {
+[data-theme='dark'] h2[class*="title"] a,
+[data-theme='dark'] h2[class*="title"] a:hover {
   color: #ffffff !important;
 }
 
-/* Sidebar links - no green */
-.sidebar_re4s a,
-.sidebar_re4s a:hover,
+/* === Sidebar links — no green === */
+nav[class*="sidebar"] a,
+nav[class*="sidebar"] a:hover,
 nav[aria-label*="Blog"] a,
 nav[aria-label*="Blog"] a:hover {
   color: #444 !important;
 }
 
-[data-theme='dark'] .sidebar_re4s a,
-[data-theme='dark'] .sidebar_re4s a:hover,
+[data-theme='dark'] nav[class*="sidebar"] a,
+[data-theme='dark'] nav[class*="sidebar"] a:hover,
 [data-theme='dark'] nav[aria-label*="Blog"] a,
 [data-theme='dark'] nav[aria-label*="Blog"] a:hover {
   color: #cad9e3 !important;
 }
 
-/* Tags border and text */
+/* Tags border */
 a.tag_zVej {
   border-color: #ddd !important;
 }
@@ -205,7 +228,7 @@ a.tag_zVej {
   border-color: #333 !important;
 }
 
-/* Keep author name green */
+/* Author name — keep green */
 .avatar__name a,
 .avatar__name a:hover {
   color: #2e8555 !important;
@@ -216,107 +239,28 @@ a.tag_zVej {
   color: #4ADE80 !important;
 }
 
-/* Remove green from links - light mode */
-.sidebarItemLink,
-.sidebarItemLink:hover,
-a.tag_zVej,
-a.tag_zVej:hover,
-.pagination-nav__link,
-.pagination-nav__link:hover,
-footer a,
-footer a:hover,
-article a:not(.avatar__photo-link),
-.read-more a,
-a[class*="readMore"],
-.col.text--right a,
-.col.text--right a:hover {
-  color: #444 !important;
-}
-
-/* Remove green from links - dark mode */
-[data-theme='dark'] .sidebarItemLink,
-[data-theme='dark'] .sidebarItemLink:hover,
-[data-theme='dark'] a.tag_zVej,
-[data-theme='dark'] a.tag_zVej:hover,
-[data-theme='dark'] .pagination-nav__link,
-[data-theme='dark'] .pagination-nav__link:hover,
-[data-theme='dark'] footer a,
-[data-theme='dark'] footer a:hover,
-[data-theme='dark'] article a:not(.avatar__photo-link),
-[data-theme='dark'] .read-more a,
-[data-theme='dark'] a[class*="readMore"],
-[data-theme='dark'] .col.text--right a,
-[data-theme='dark'] .col.text--right a:hover {
-  color: #cad9e3 !important;
-}
-
-/* Blog post title - no green */
-article h2 a,
-article h2 a:hover,
-h2.title_f1Hy a,
-h2.title_f1Hy a:hover {
-  color: #2d2a2b !important;
-}
-
-[data-theme='dark'] article h2 a,
-[data-theme='dark'] article h2 a:hover,
-[data-theme='dark'] h2.title_f1Hy a,
-[data-theme='dark'] h2.title_f1Hy a:hover {
-  color: #ffffff !important;
-}
-
-/* Sidebar links - no green */
-.sidebar_re4s a,
-.sidebar_re4s a:hover,
-nav[aria-label*="Blog"] a,
-nav[aria-label*="Blog"] a:hover {
-  color: #444 !important;
-}
-
-[data-theme='dark'] .sidebar_re4s a,
-[data-theme='dark'] .sidebar_re4s a:hover,
-[data-theme='dark'] nav[aria-label*="Blog"] a,
-[data-theme='dark'] nav[aria-label*="Blog"] a:hover {
-  color: #cad9e3 !important;
-}
-
-/* Tags border and text */
-a.tag_zVej {
-  border-color: #ddd !important;
-}
-
-[data-theme='dark'] a.tag_zVej {
-  border-color: #333 !important;
-}
-
-/* Keep author name green */
-.avatar__name a,
-.avatar__name a:hover {
-  color: #2e8555 !important;
-}
-
-[data-theme='dark'] .avatar__name a,
-[data-theme='dark'] .avatar__name a:hover {
-  color: #4ADE80 !important;
-}
-
-/* Reduce author avatar size */
+/* Author avatar size */
 img.avatar__photo {
   width: 44px !important;
   height: 44px !important;
 }
 
+/* === Sidebar meta — fix contrast (accessibility) === */
+[class*="sidebarItemMeta"] {
+  color: #595959 !important;
+}
 
+[data-theme='dark'] [class*="sidebarItemMeta"] {
+  color: #9ca3af !important;
+}
 
-/* ===== MOBILE ONLY - Does not affect desktop ===== */
+/* === Mobile === */
 @media (max-width: 996px) {
-  /* Rearrange navbar: Logo left, hamburger right */
   .navbar__inner {
     flex-direction: row !important;
     justify-content: space-between !important;
   }
-  
-  /* Move hamburger to right side */
+
   .navbar__toggle {
     display: flex !important;
     color: #2d2a2b !important;
@@ -324,75 +268,66 @@ img.avatar__photo {
     position: absolute !important;
     right: 16px !important;
   }
-  
+
   [data-theme='dark'] .navbar__toggle {
     color: #cad9e3 !important;
   }
-  
-  /* Keep Deploy button visible in navbar on mobile */
+
   .navbar-deploy-button {
     display: flex !important;
     order: 9 !important;
     position: absolute !important;
     right: 70px !important;
   }
-  
-  /* Keep theme toggle visible on mobile */
+
+  /* Hide theme toggle on mobile navbar — available in hamburger */
   .navbar__items--right > div[class*="colorModeToggle"],
   .navbar__items--right > div[class*="toggle_"] {
-    display: flex !important;
-    order: 8 !important;
-    position: absolute !important;
-    right: 160px !important;
+    display: none !important;
   }
-  
-  /* Hide nav links on mobile (they go in hamburger) */
+
   .navbar__items:not(.navbar__items--right) .navbar__link:not(.navbar-deploy-button) {
     display: none !important;
   }
-  
-  /* Hide external link arrows in mobile sidebar */
+
   .navbar-sidebar .menu__link svg,
   .navbar-sidebar a svg {
     display: none !important;
   }
-  
-  /* Mobile sidebar background */
+
   .navbar-sidebar {
     background: #fdf8f8 !important;
   }
-  
+
   [data-theme='dark'] .navbar-sidebar {
     background: #040911 !important;
   }
-  
-  /* Mobile sidebar links styling */
+
   .navbar-sidebar .menu__link {
     color: #2d2a2b !important;
     padding: 14px 20px !important;
     font-size: 16px !important;
     font-weight: 500 !important;
   }
-  
+
   [data-theme='dark'] .navbar-sidebar .menu__link {
     color: #cad9e3 !important;
   }
-  
+
   .navbar-sidebar .menu__link:hover {
     background: rgba(0,0,0,0.05) !important;
   }
-  
+
   [data-theme='dark'] .navbar-sidebar .menu__link:hover {
     background: rgba(255,255,255,0.05) !important;
   }
-  
-  /* Hide Deploy from hamburger menu (it's already in navbar) */
+
   .navbar-sidebar .navbar-deploy-button {
     display: none !important;
   }
 }
 
-/* Custom scrollbar styling */
+/* === Scrollbar === */
 * {
   scrollbar-width: thin;
   scrollbar-color: #555 #2a2a2a;
@@ -416,7 +351,6 @@ img.avatar__photo {
   background: #666;
 }
 
-/* Light mode scrollbar */
 [data-theme='light'] * {
   scrollbar-color: #ccc #f0f0f0;
 }
@@ -433,20 +367,11 @@ img.avatar__photo {
   background: #bbb;
 }
 
-/* Hide theme toggle from mobile navbar - keep only in hamburger */
-@media (max-width: 996px) {
-  .navbar__items--right > div[class*="colorModeToggle"],
-  .navbar__items--right > div[class*="toggle_"] {
-    display: none !important;
-  }
-}
-
-/* Keep Deploy button text color on hover - dark mode */
+/* Deploy button hover */
 [data-theme='dark'] .navbar-deploy-button:hover {
   color: #2a2828 !important;
 }
 
-/* Keep Deploy button text color on hover - light mode */
 [data-theme='light'] .navbar-deploy-button:hover {
   color: #ffffff !important;
 }
