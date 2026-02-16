@@ -16,6 +16,107 @@ keywords:
   - openclaw exposed instances
   - openclaw hardening guide
 ---
+import Head from '@docusaurus/Head';
+
+<Head>
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "OpenClaw is a Security Nightmare — Here's the Safe Way to Run It",
+      "description": "Complete timeline of every OpenClaw CVE, the ClawHavoc malware campaign, 42,000+ exposed instances, the Moltbook leak, and how to deploy safely.",
+      "datePublished": "2026-02-17",
+      "dateModified": "2026-02-17",
+      "author": {
+        "@type": "Person",
+        "name": "Dhayabaran V",
+        "jobTitle": "Founder",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Barrack AI",
+          "url": "https://barrack.ai"
+        }
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Barrack AI",
+        "url": "https://barrack.ai"
+      }
+    })}
+  </script>
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is OpenClaw safe to use in 2026?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not with default settings. OpenClaw has had six GitHub Security Advisories in three weeks, 512 vulnerabilities in its first security audit, 341 confirmed malicious skills on ClawHub, and over 42,000 publicly exposed instances. It can be made safer by running on an isolated cloud VM with loopback binding, Docker sandboxing, strict tool allowlists, and burner accounts — but no configuration eliminates all risk."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is CVE-2026-25253?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CVE-2026-25253 is a critical vulnerability (CVSS 8.8) in OpenClaw that enables one-click remote code execution through cross-site WebSocket hijacking. A victim who visits a malicious web page has their authentication token stolen in milliseconds. It was patched in version 2026.1.29."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is ClawHavoc?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ClawHavoc is a coordinated malware campaign that planted 335 malicious skills on ClawHub. The skills disguised themselves as cryptocurrency wallets and YouTube utilities, delivering Atomic macOS Stealer (AMOS). All 335 skills shared the same command-and-control infrastructure at IP 91.92.242.30."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many OpenClaw instances are exposed on the internet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "As of February 2026, SecurityScorecard identified over 135,000 unique IPs running exposed OpenClaw instances across 82 countries, with 12,812 exploitable via remote code execution."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happened with Moltbook?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Moltbook exposed approximately 1.5 million API authentication tokens, 35,000 email addresses, and 4,000 private messages because its Supabase database had Row Level Security disabled. The fix required just two SQL statements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why did OpenClaw change its name?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "OpenClaw was originally called Clawdbot. Anthropic's trademark team forced a rename to Moltbot on January 27, 2026. The developer then rebranded to OpenClaw on January 29, 2026."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Did any governments issue warnings about OpenClaw?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Belgium's Centre for Cybersecurity, China's MIIT, and South Korea's major tech companies all issued warnings. Gartner recommended enterprises block OpenClaw downloads and traffic immediately."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is OpenClaw safe to use in an enterprise?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Gartner classified OpenClaw as insecure by default. Noma Security reported 53% of enterprise customers gave OpenClaw privileged access over a single weekend. Security researchers universally recommend against enterprise deployment without extensive hardening."
+          }
+        }
+      ]
+    })}
+  </script>
+</Head>
 
 **OpenClaw, the open-source AI agent that rocketed to 179,000 GitHub stars and triggered a Mac mini shortage, is riddled with critical vulnerabilities that have already been exploited in the wild.** A one-click remote code execution flaw, 341 malware-laden skills on its marketplace, over 42,000 exposed instances on the public internet, and a vibe-coded social network that leaked 1.5 million API tokens — this is not a theoretical risk. Security researchers, government agencies, and firms from Cisco to Kaspersky have called it one of the most dangerous consumer AI deployments ever released. Yet OpenClaw remains genuinely useful. The solution is not to avoid it entirely but to run it on an isolated cloud VM where its blast radius is contained. Here's every documented vulnerability, and the exact steps to deploy it safely.
 
