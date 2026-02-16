@@ -17,3 +17,38 @@ hola:
   label: Hola
   permalink: /hola
   description: Hola tag description
+
+openclaw:
+  label: OpenClaw
+  permalink: /openclaw
+  description: OpenClaw AI agent security and vulnerability analysis
+
+security:
+  label: Security
+  permalink: /security
+  description: Cybersecurity analysis and vulnerability research
+
+vulnerabilities:
+  label: Vulnerabilities
+  permalink: /vulnerabilities
+  description: Software vulnerability documentation and CVE tracking
+
+CVE:
+  label: CVE
+  permalink: /cve
+  description: Common Vulnerabilities and Exposures documentation
+
+AI-agents:
+  label: AI Agents
+  permalink: /ai-agents
+  description: Autonomous AI agent security and deployment
+
+ClawHavoc:
+  label: ClawHavoc
+  permalink: /clawhavoc
+  description: ClawHavoc malware campaign targeting OpenClaw users
+
+Moltbook:
+  label: Moltbook
+  permalink: /moltbook
+  description: Moltbook AI social network security incidents
