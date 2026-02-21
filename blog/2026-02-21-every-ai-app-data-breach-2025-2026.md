@@ -4,6 +4,7 @@ description: Between January 2025 and February 2026, at least 20 documented secu
 slug: every-ai-app-data-breach-2025-2026
 tags: [ai-security, firebase, data-breach, self-hosted-ai, cloud-gpu, vibe-coding]
 keywords: [ai app data leak, firebase misconfiguration, ai chatbot data breach, chat and ask ai breach, supabase rls, vibe coding security, self-hosted llm, gpu cloud, ai app security 2026]
+image: /img/ai-data-breach-og.png
 authors: [dhaya]
 date: 2026-02-21
 ---
