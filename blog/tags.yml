@@ -52,3 +52,33 @@ Moltbook:
   label: Moltbook
   permalink: /moltbook
   description: Moltbook AI social network security incidents
+
+ai-security:
+  label: AI Security
+  permalink: /ai-security
+  description: AI application security research and vulnerability analysis
+
+firebase:
+  label: Firebase
+  permalink: /firebase
+  description: Firebase misconfiguration and cloud backend security
+
+data-breach:
+  label: Data Breach
+  permalink: /data-breach
+  description: Data breach documentation and incident analysis
+
+self-hosted-ai:
+  label: Self-Hosted AI
+  permalink: /self-hosted-ai
+  description: Self-hosted AI models and local inference
+
+cloud-gpu:
+  label: Cloud GPU
+  permalink: /cloud-gpu
+  description: Cloud GPU infrastructure and compute
+
+vibe-coding:
+  label: Vibe Coding
+  permalink: /vibe-coding
+  description: AI-generated code and vibe coding security risks
