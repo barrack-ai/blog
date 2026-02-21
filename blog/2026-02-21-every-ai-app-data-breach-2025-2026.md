@@ -300,4 +300,44 @@ If you are building AI features into a product, processing sensitive data throug
 
 ---
 
+*Last updated: February 21, 2026*
+
 *All incidents documented in this article are sourced from primary researcher disclosures, CVE databases, court filings, regulatory decisions, and original reporting by 404 Media, WIRED, Malwarebytes, Cybernews, Wiz Research, and the BBC. No claims in this article are based on assumptions or speculation. If you are a researcher or developer mentioned in this article and believe any detail is inaccurate, contact us and we will correct it immediately.*
+
+**Barrack AI provides isolated GPU cloud instances for AI workloads. [Learn more →](https://barrack.ai)**
+
+---
+
+## Frequently Asked Questions
+
+### What are the most common root causes of AI app data breaches?
+
+Across all 20 documented incidents between January 2025 and February 2026, four root causes account for nearly every breach: misconfigured Firebase databases (with security rules set to allow public read/write access), missing Supabase Row Level Security (RLS) policies, hardcoded API keys and cloud credentials embedded in client-side code, and absent or default authentication on cloud backends. CovertLabs found 196 out of 198 iOS AI apps had Firebase misconfigurations. Cybernews found 72% of Android AI apps contained hardcoded secrets. These are configuration errors, not sophisticated exploits.
+
+### Which AI app data breach was the largest?
+
+By record count, Chat & Ask AI exposed approximately 406 million database records (including 300 million+ chat messages) from 18-25 million users. By affected population, McDonald's McHire platform potentially exposed data from 64 million job applicants. By data volume, Cybernews' Android audit found over 200 million files totaling 730 terabytes across publicly accessible Google Cloud storage buckets.
+
+### Are vibe-coded apps safe to use?
+
+The evidence suggests significant risk. Escape's October 2025 audit of 5,600 vibe-coded applications found over 2,000 vulnerabilities and 400+ exposed secrets. Lovable, a $1.8 billion vibe-coding platform, had 10.3% of its apps with critical security flaws (CVE-2025-48757). Base44 had a single authentication bypass that compromised every app on its platform. Veracode's research found that LLMs choose insecure code patterns 45% of the time. Ravenna's December 2025 assessment of five vibe-coding tools across 15 applications found 69 vulnerabilities including half a dozen critical flaws.
+
+### What is Firebase and why is it misconfigured so often?
+
+Firebase is Google's backend-as-a-service platform used by approximately 30% of all Google Play apps. Its Security Rules govern who can read and write data. The default development configuration is permissive (allowing open access for testing), and developers frequently ship applications without restricting these rules for production. Comparitech (2020), RedHunt Labs, Quokka (2022), and CovertLabs (2026) have all independently documented Firebase misconfiguration rates ranging from 4.8% to 98.9%, with AI apps showing dramatically higher rates than general applications.
+
+### What is Supabase Row Level Security (RLS) and why does it matter?
+
+Supabase is an open-source Firebase alternative that uses PostgreSQL. Row Level Security (RLS) is a PostgreSQL feature that restricts which rows a user can access in a database table. Supabase applications use a public `anon_key` that is visible in client-side JavaScript by design. When RLS is properly configured, this key can only access data the user is authorized to see. When RLS is not enabled, the public key grants full unauthenticated access to every row in every table. Both Lovable (CVE-2025-48757) and Moltbook were compromised because RLS was never enabled on their Supabase databases.
+
+### Is my data safe with AI wrapper apps?
+
+Based on the documented evidence, there is substantial risk. CovertLabs found 98.9% of the iOS AI apps they scanned were actively leaking data. Cybernews found 72% of Android AI apps contained hardcoded secrets. Chat & Ask AI, an app with 50 million installs providing access to ChatGPT, Claude, and Gemini, exposed 300 million+ chat messages because its Firebase rules were set to allow public read access. The content of leaked chats across multiple breaches included discussions of mental health, financial details, illegal activities, and personal medical information.
+
+### What is the alternative to using third-party AI apps?
+
+Self-hosting open-source models on infrastructure you control eliminates the class of vulnerabilities documented in this article. Open-source models including DeepSeek V3.2, GLM-5, Qwen3, and Llama 4 can run on a single cloud GPU with 80GB of VRAM. When self-hosting, prompts and data never leave the VM. There is no third-party database to misconfigure, no API key exposed in a JavaScript bundle, and no cloud backend for a researcher to discover. This approach requires more technical setup than using a wrapper app but removes the dependency on third-party security configurations entirely.
+
+### How often is this article updated?
+
+This article is maintained as a living reference. New incidents are added as they are publicly documented and verified through primary sources. The "Last updated" date at the bottom of the article reflects the most recent revision. If you are aware of a documented AI app data breach not included here, contact us.
