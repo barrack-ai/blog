@@ -82,3 +82,23 @@ vibe-coding:
   label: Vibe Coding
   permalink: /vibe-coding
   description: AI-generated code and vibe coding security risks
+
+ai:
+  label: AI
+  permalink: /ai
+  description: Artificial intelligence news and analysis
+
+aws:
+  label: AWS
+  permalink: /aws
+  description: Amazon Web Services incidents and analysis
+
+kiro:
+  label: Kiro
+  permalink: /kiro
+  description: Amazon Kiro AI coding agent
+
+production-outage:
+  label: Production Outage
+  permalink: /production-outage
+  description: AI-caused production outages and incidents
