@@ -1,0 +1,173 @@
+---
+title: "Self-Host Qwen 3-32B in Minutes — Zero Configuration Required"
+description: "Deploy a fully configured Qwen 3-32B instance with OpenWebUI on your own GPU. No terminal commands, no model downloads, no configuration files."
+slug: self-host-qwen-3-32b
+authors: [dhaya]
+image: ./og-self-host-qwen-3-32b.png
+tags: [qwen, llm, self-hosted, open-source, gpu-cloud]
+---
+
+Running a 32-billion parameter language model on your own GPU typically involves installing drivers, setting up Ollama, downloading model weights, configuring a web interface, and troubleshooting port conflicts. That process takes anywhere from 30 minutes to several hours depending on your familiarity with the tooling.
+
+We built a pre-configured VM image that eliminates all of it. You select a GPU, pick the image, and deploy. The model is already downloaded, Ollama is already running, and OpenWebUI is already serving on port 8080. You open your browser and start using it.
+
+This guide walks through the exact steps.
+
+<!-- truncate -->
+
+## What You Get
+
+The **Barrack Qwen 3-32B** image ships with the following pre-installed and pre-configured:
+
+- **Qwen 3-32B** — 32 billion parameter open-source LLM by Alibaba, already downloaded
+- **Ollama** — model serving runtime, running as a system service on port 11434
+- **OpenWebUI** — browser-based chat interface, serving on port 8080
+- **Ubuntu 22.04** with NVIDIA drivers and CUDA pre-configured
+
+All services start automatically on boot. There is nothing to install, configure, or troubleshoot.
+
+## Compatible GPUs
+
+This image is available on the following GPUs:
+
+| GPU | VRAM |
+|---|---|
+| RTX A6000 | 48 GB |
+| L40 | 48 GB |
+| A100 PCIe | 80 GB |
+| H100 PCIe | 80 GB |
+| H100 PCIe NVLink | 80 GB |
+
+The Qwen 3-32B model occupies approximately 19GB on disk and around 30GB of VRAM during inference. Any of the above GPUs have sufficient memory to run it.
+
+## Step 1 — Create an Account
+
+Go to [barrack.ai/signup](https://barrack.ai/signup). You can register with an email address or use Google OAuth.
+
+For email registration, you will receive a 6-digit verification code. Enter it to complete your account.
+
+After registration, navigate to [My Account](https://barrack.ai/account) and fill in the required billing fields: full name, billing address, postal code, and country. Your billing currency is automatically assigned based on your country.
+
+Purchase credits to provision resources. Minimum deposit amounts are $5.00 (USD), €5.00 (EUR), or ₹100.00 (INR).
+
+## Step 2 — Deploy the VM
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Select your GPU — this image is compatible with **RTX A6000**, **L40**, **A100 PCIe**, **H100 PCIe**, and **H100 PCIe NVLink**
+3. Set GPU count to **1**
+4. In the **OS Image** dropdown, select **Barrack Qwen 3-32B**
+5. Create or select an SSH key
+6. Click **Deploy**
+
+The VM enters a provisioning state within seconds. Once the status changes to **Active**, your instance is ready.
+
+> **Prefer API deployment?** You can also deploy programmatically using our API. See the [deployment documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0).
+
+## Step 3 — Find Your IP Address
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Click the dropdown at the top of the page
+3. Select your instance
+4. Click **Details**
+5. Your public IP address is displayed there
+
+Public IP is automatically enabled for this image. No additional networking configuration is required.
+
+## Step 4 — Open the Interface
+
+Open your browser and navigate to:
+
+```
+http://YOUR_PUBLIC_IP:8080
+```
+
+On first visit, OpenWebUI presents a **signup page**. Create your account with an email and password. This is your local OpenWebUI account on your VM — it is not connected to any external service.
+
+After signup, you land in the chat interface. Qwen 3-32B is pre-selected in the model dropdown. Type a message and the model responds.
+
+That is it. No terminal access required. No commands to run.
+
+## What You Can Do
+
+Qwen 3-32B handles a wide range of tasks:
+
+- **Code generation and review** — Python, JavaScript, Rust, C++, SQL, and other languages
+- **Reasoning and analysis** — multi-step logic, math, structured problem-solving
+- **Multilingual support** — strong performance in English and Chinese, functional in dozens of other languages
+- **Document drafting** — reports, emails, summaries, technical documentation
+- **Conversation** — multi-turn dialogue with context retention
+
+All processing happens on your GPU. No data leaves your VM. No API calls to external services. No token limits. No rate limits.
+
+## SSH Access
+
+If you need terminal access to the VM for any reason, connect via SSH using the key you created during deployment:
+
+```bash
+ssh ubuntu@YOUR_PUBLIC_IP
+```
+
+Ollama is accessible locally at `http://localhost:11434`. You can interact with it directly:
+
+```bash
+ollama list
+ollama run qwen3:32b "Your prompt here"
+```
+
+## When to Use This
+
+- **Privacy-sensitive workloads** — legal, medical, financial documents that cannot be sent to third-party APIs
+- **Uncensored inference** — no content filtering or alignment restrictions beyond the base model
+- **Predictable costs** — per-minute billing with no per-token charges, no surprise invoices
+- **Development and testing** — prototype against a local LLM before committing to an API provider
+- **Internal tools** — deploy a private AI assistant for your team, accessible only via your VM's IP
+
+## Resources
+
+- [Qwen 3 Model Card — Hugging Face](https://huggingface.co/Qwen/Qwen3-32B)
+- [Ollama Documentation](https://ollama.ai)
+- [OpenWebUI Documentation](https://docs.openwebui.com)
+- [Barrack AI Deployment Guide](https://docs.barrack.ai/getting-started-1860209m0)
+- [Barrack AI API Documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0)
+
+## Frequently Asked Questions
+
+### What is the Barrack Qwen 3-32B image?
+A pre-configured virtual machine image that includes Qwen 3-32B (already downloaded), Ollama (model serving runtime), and OpenWebUI (browser-based chat interface). All services are installed and configured to start automatically on boot. You deploy the VM, open your browser, and start using the model immediately.
+
+### Which GPUs can run Qwen 3-32B?
+The image is available on RTX A6000 (48GB), L40 (48GB), A100 PCIe (80GB), H100 PCIe (80GB), and H100 PCIe NVLink (80GB). The model requires approximately 30GB of VRAM during inference, so any of these GPUs have sufficient memory.
+
+### Do I need to install anything after deploying the VM?
+No. Qwen 3-32B is pre-downloaded, Ollama is running as a system service, and OpenWebUI is serving on port 8080. All services start automatically on boot. There is no terminal setup, no dependency installation, and no configuration required.
+
+### Does my data leave the VM?
+No. All inference runs locally on the GPU attached to your VM. No prompts or responses are sent to any external API. No telemetry. No data collection. Your VM is an isolated compute instance.
+
+### What does it cost?
+Barrack AI uses per-minute billing with no contracts. You pay only for the time your VM is running. There are no per-token charges, no per-request fees, and no monthly subscriptions. H100 PCIe starts at $1.99/hr.
+
+### Can I access the model via API instead of the browser interface?
+Yes. Ollama exposes a local API at `http://localhost:11434` on the VM. You can send requests to it directly via SSH or integrate it into your applications. OpenWebUI also exposes an API layer for programmatic access.
+
+### How do I deploy via API instead of the dashboard?
+Barrack AI provides a full deployment API. See the [API documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0) for programmatic instance creation, management, and termination.
+
+---
+
+<form name="deploy-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/form-success" style={{background: 'var(--ifm-background-color)', border: '1px solid var(--ifm-color-emphasis-200)', borderRadius: '10px', padding: '22px 20px', marginTop: '24px', marginBottom: '16px'}}>
+  <input type="hidden" name="bot-field" />
+  <input type="hidden" name="form-name" value="deploy-inquiry" />
+  <input type="hidden" name="subject" value="New lead from blog.barrack.ai — deploy-inquiry" />
+  <p style={{fontSize: '14px', fontWeight: 500, color: 'var(--ifm-color-emphasis-600)', marginBottom: '14px'}}>Want to deploy? Have questions?</p>
+  <div style={{display: 'flex', gap: '8px', maxWidth: '400px'}}>
+    <input type="email" name="email" placeholder="you@company.com" required style={{flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--ifm-color-emphasis-200)', background: 'var(--ifm-background-color)', color: 'var(--ifm-font-color-base)', fontSize: '13px'}} />
+    <button type="submit" style={{padding: '8px 18px', borderRadius: '6px', border: 'none', background: 'var(--ifm-font-color-base)', color: 'var(--ifm-background-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'}}>Get in touch</button>
+  </div>
+</form>
+
+---
+
+*Last updated: February 23, 2026*
+
+*Barrack AI provides GPU cloud instances for AI workloads — per-minute billing, no contracts. [Learn more →](https://barrack.ai)*

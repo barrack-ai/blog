@@ -1,0 +1,231 @@
+---
+title: "Run FLUX, Stable Diffusion, and Train LoRAs — One-Click GPU Setup"
+description: "Deploy a pre-configured ComfyUI environment with FLUX, Stable Diffusion, and Kohya LoRA training tools. Generate images and train custom models without any setup."
+slug: flux-stable-diffusion-lora-training
+authors: [dhaya]
+image: ./og-flux-stable-diffusion-lora-training.png
+tags: [flux, stable-diffusion, lora, kohya, comfyui, image-generation, gpu-cloud]
+---
+
+Setting up an image generation environment with FLUX, Stable Diffusion, and LoRA training involves installing ComfyUI, downloading multiple model checkpoints (each several gigabytes), configuring Kohya for training, and ensuring all dependencies resolve cleanly. Depending on your starting point, this takes one to several hours.
+
+We built a VM image with everything pre-installed. FLUX and Stable Diffusion models are downloaded. ComfyUI is configured. Kohya training tools are ready. You deploy the VM, open port 9093 in your browser, and start generating or training.
+
+<!-- truncate -->
+
+## What You Get
+
+The **Barrack ComfyUI SD-FLUX-KOHYA** image ships with:
+
+- **FLUX.1 Schnell** — Black Forest Labs' fast image generation model (`flux1-schnell-fp8.safetensors`), already downloaded
+- **Stable Diffusion** — SDXL and SD model support, pre-configured
+- **Kohya** — LoRA training toolkit for fine-tuning models on your own images
+- **ComfyUI** — node-based visual interface, serving on port 9093
+- **Pre-built workflow templates** — including the FLUX Schnell workflow, ready to load
+- **Ubuntu 22.04** with NVIDIA drivers and CUDA pre-configured
+
+All services start automatically on boot.
+
+## Compatible GPUs
+
+This image is available on the following GPUs:
+
+| GPU | VRAM |
+|---|---|
+| RTX A6000 | 48 GB |
+| L40 | 48 GB |
+| A100 PCIe | 80 GB |
+| H100 PCIe | 80 GB |
+| H100 PCIe NVLink | 80 GB |
+
+FLUX Schnell in fp8 quantization runs comfortably on all of the above. LoRA training benefits from higher VRAM — the A100 and H100 allow larger batch sizes and faster training. On the RTX A6000 (48GB), FLUX Schnell generates a 1024×1024 image in approximately 10–15 seconds at 4 inference steps.
+
+## Step 1 — Create an Account
+
+Go to [barrack.ai/signup](https://barrack.ai/signup). Register with email or Google OAuth.
+
+Complete your billing profile at [My Account](https://barrack.ai/account): full name, billing address, postal code, and country.
+
+Purchase credits. Minimum deposit: $5.00 (USD), €5.00 (EUR), or ₹100.00 (INR).
+
+## Step 2 — Deploy the VM
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Select your GPU — this image is compatible with **RTX A6000**, **L40**, **A100 PCIe**, **H100 PCIe**, and **H100 PCIe NVLink**
+3. Set GPU count to **1**
+4. In the **OS Image** dropdown, select **Barrack ComfyUI SD-FLUX-KOHYA**
+5. Create or select an SSH key
+6. Click **Deploy**
+
+The VM enters provisioning within seconds. Wait until the status shows **Active**.
+
+> **Prefer API deployment?** See the [API deployment documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0).
+
+## Step 3 — Find Your IP Address
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Click the dropdown at the top of the page
+3. Select your instance
+4. Click **Details**
+5. Your public IP address is displayed there
+
+Public IP is automatically enabled for this image.
+
+## Step 4 — Open ComfyUI
+
+Open your browser and navigate to:
+
+```
+http://YOUR_PUBLIC_IP:9093
+```
+
+This loads the ComfyUI interface with an empty canvas.
+
+## Step 5 — Load a Workflow and Generate
+
+### Generate with FLUX
+
+1. Click **Workflow** in the top menu
+2. Click **Load**
+3. Select the `flux_schnell_workflow` template
+4. The workflow loads with all nodes connected: Load Checkpoint → CLIP Text Encode → KSampler → VAE Decode → Save Image
+5. The FLUX Schnell model (`flux1-schnell-fp8.safetensors`) is pre-selected in the checkpoint node
+6. Enter your prompt in the **CLIP Text Encode (Positive Prompt)** node
+7. Click **Queue Prompt** or the **Run** button
+8. Image generates in approximately 10–15 seconds
+
+### Example Prompt
+
+```
+a bottle with a beautiful rainbow galaxy inside it on top of a wooden table in the middle of a modern kitchen, photorealistic, 8K
+```
+
+Default settings: 1024×1024 resolution, 4 steps, Euler sampler.
+
+### Generate with Stable Diffusion
+
+ComfyUI supports loading Stable Diffusion checkpoints (SDXL, SD 1.5, SD 3.5) in the same interface. Swap the model in the Load Checkpoint node to switch between FLUX and SD models. Additional SD checkpoints can be downloaded to `~/ComfyUI/models/checkpoints/` via SSH.
+
+## Train LoRAs with Kohya
+
+LoRA (Low-Rank Adaptation) lets you fine-tune a model on a small set of reference images — typically 20–50 images — to learn a specific style, character, or object. The resulting LoRA file is small (typically 100–300 MB) and can be loaded into ComfyUI alongside the base model.
+
+Kohya training tools are pre-installed on this image. To use them:
+
+1. SSH into your VM:
+
+```bash
+ssh ubuntu@YOUR_PUBLIC_IP
+```
+
+2. Prepare your training images in a directory on the VM. Upload them via `scp`:
+
+```bash
+scp -r ./my_training_images/ ubuntu@YOUR_PUBLIC_IP:~/training_data/
+```
+
+3. Run Kohya training with your images. Training a LoRA on 50 images takes approximately 30 minutes on the RTX A6000.
+
+4. Once training completes, move the output LoRA file to the ComfyUI models directory:
+
+```bash
+cp output.safetensors ~/ComfyUI/models/loras/
+```
+
+5. In ComfyUI, add a **Load LoRA** node to your workflow and select your trained file. Generate images using your custom-trained style.
+
+## SSH Access
+
+Connect to the VM for file management or training:
+
+```bash
+ssh ubuntu@YOUR_PUBLIC_IP
+```
+
+Generated images are saved in:
+
+```bash
+ls ~/ComfyUI/output/
+```
+
+Download generated images:
+
+```bash
+scp ubuntu@YOUR_PUBLIC_IP:~/ComfyUI/output/your_image.png ./
+```
+
+## When to Use This
+
+- **Image generation** — produce images with FLUX or Stable Diffusion for design, marketing, or creative projects
+- **Custom model training** — train LoRAs on your own images to generate consistent characters, styles, or branded visuals
+- **Private generation** — no content moderation, no watermarks, no data sent to external services
+- **Batch generation** — ComfyUI supports queuing multiple prompts for overnight batch runs
+- **Experimentation** — swap models, adjust samplers, modify workflows, and iterate without per-image fees
+
+## FLUX vs Stable Diffusion — When to Use Which
+
+| | FLUX Schnell | Stable Diffusion (SDXL) |
+|---|---|---|
+| Speed | ~10–15 seconds per image | ~20–30 seconds per image |
+| Quality at default settings | High detail, strong prompt adherence | High detail, large community fine-tune ecosystem |
+| LoRA ecosystem | Growing | Massive — thousands of community LoRAs available |
+| Best for | Fast iteration, photorealistic output | Style variety, community models, established workflows |
+
+Both are available on this image. Use whichever fits your project.
+
+## Resources
+
+- [FLUX.1 — Black Forest Labs](https://blackforestlabs.ai)
+- [Stable Diffusion — Stability AI](https://stability.ai)
+- [Kohya — GitHub](https://github.com/kohya-ss/sd-scripts)
+- [ComfyUI — GitHub](https://github.com/comfyanonymous/ComfyUI)
+- [Barrack AI Deployment Guide](https://docs.barrack.ai/getting-started-1860209m0)
+- [Barrack AI API Documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0)
+
+## Frequently Asked Questions
+
+### What is the Barrack ComfyUI SD-FLUX-KOHYA image?
+A pre-configured virtual machine image that includes FLUX.1 Schnell (already downloaded), Stable Diffusion support, Kohya LoRA training tools, and ComfyUI as the visual interface. All dependencies are installed and services start automatically on boot.
+
+### Which GPUs can run this image?
+The image is available on RTX A6000 (48GB), L40 (48GB), A100 PCIe (80GB), H100 PCIe (80GB), and H100 PCIe NVLink (80GB). FLUX Schnell in fp8 runs comfortably on all of them. LoRA training benefits from higher VRAM.
+
+### Do I need to install anything after deploying the VM?
+No. FLUX Schnell is pre-downloaded, ComfyUI is configured, Kohya is installed, and workflow templates are ready to load. Everything starts automatically on boot.
+
+### How fast is image generation?
+FLUX Schnell generates a 1024×1024 image in approximately 10–15 seconds at 4 inference steps on an RTX A6000. Stable Diffusion SDXL takes approximately 20–30 seconds per image.
+
+### What is LoRA training?
+LoRA (Low-Rank Adaptation) is a technique for fine-tuning a base model on a small set of reference images. You provide 20–50 images of a specific style, character, or object, and the training process produces a lightweight file (100–300 MB) that biases the model toward generating content matching your references.
+
+### Can I use community LoRAs and checkpoints?
+Yes. You can download any compatible checkpoint or LoRA file to the appropriate directory on the VM via SSH (`~/ComfyUI/models/checkpoints/` for checkpoints, `~/ComfyUI/models/loras/` for LoRAs) and use them in ComfyUI immediately.
+
+### Does my data leave the VM?
+No. All generation and training runs locally on your GPU. No images, prompts, or training data are sent to any external service.
+
+### What does it cost?
+Barrack AI uses per-minute billing with no contracts. You pay only for the time your VM is running. There are no per-image fees and no monthly subscriptions. H100 PCIe starts at $1.99/hr.
+
+### How do I deploy via API instead of the dashboard?
+Barrack AI provides a full deployment API. See the [API documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0) for programmatic instance creation, management, and termination.
+
+---
+
+<form name="deploy-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/form-success" style={{background: 'var(--ifm-background-color)', border: '1px solid var(--ifm-color-emphasis-200)', borderRadius: '10px', padding: '22px 20px', marginTop: '24px', marginBottom: '16px'}}>
+  <input type="hidden" name="bot-field" />
+  <input type="hidden" name="form-name" value="deploy-inquiry" />
+  <input type="hidden" name="subject" value="New lead from blog.barrack.ai — deploy-inquiry" />
+  <p style={{fontSize: '14px', fontWeight: 500, color: 'var(--ifm-color-emphasis-600)', marginBottom: '14px'}}>Want to deploy? Have questions?</p>
+  <div style={{display: 'flex', gap: '8px', maxWidth: '400px'}}>
+    <input type="email" name="email" placeholder="you@company.com" required style={{flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--ifm-color-emphasis-200)', background: 'var(--ifm-background-color)', color: 'var(--ifm-font-color-base)', fontSize: '13px'}} />
+    <button type="submit" style={{padding: '8px 18px', borderRadius: '6px', border: 'none', background: 'var(--ifm-font-color-base)', color: 'var(--ifm-background-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'}}>Get in touch</button>
+  </div>
+</form>
+
+---
+
+*Last updated: February 23, 2026*
+
+*Barrack AI provides GPU cloud instances for AI workloads — per-minute billing, no contracts. [Learn more →](https://barrack.ai)*

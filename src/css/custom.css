@@ -375,3 +375,28 @@ img.avatar__photo {
 [data-theme='light'] .navbar-deploy-button:hover {
   color: #ffffff !important;
 }
+
+/* Lead capture form - light mode */
+form[name="deploy-inquiry"] input[type="email"]::placeholder {
+  color: #aaa;
+}
+
+form[name="deploy-inquiry"] input[type="email"]:focus {
+  outline: none;
+  border-color: #333;
+}
+
+/* Lead capture form - dark mode */
+[data-theme='dark'] form[name="deploy-inquiry"] input[type="email"]::placeholder {
+  color: #444;
+}
+
+[data-theme='dark'] form[name="deploy-inquiry"] input[type="email"]:focus {
+  outline: none;
+  border-color: #e0eacc;
+}
+
+/* Button hover */
+form[name="deploy-inquiry"] button[type="submit"]:hover {
+  opacity: 0.85;
+}

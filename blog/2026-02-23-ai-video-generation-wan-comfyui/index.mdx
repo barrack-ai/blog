@@ -1,0 +1,221 @@
+---
+title: "Generate AI Videos on Your Own GPU — WAN 2.1 + ComfyUI, Pre-Configured"
+description: "Deploy a ready-to-use AI video generation setup with WAN 2.1 and ComfyUI. Text-to-video and image-to-video, no installation required."
+slug: ai-video-generation-wan-comfyui
+authors: [dhaya]
+image: ./og-ai-video-generation-wan-comfyui.png
+tags: [wan, video-generation, comfyui, text-to-video, image-to-video, gpu-cloud]
+---
+
+AI video generation models like WAN 2.1 are open-source and free to run. The actual barrier is setup — downloading 14 billion parameter model weights, installing ComfyUI, configuring custom nodes, resolving dependency conflicts, and ensuring the correct workflow templates are in place. On a fresh VM, this takes hours.
+
+We built two pre-configured VM images that skip the entire process. Every model, every custom node, and every workflow template is already installed. You deploy the VM, open your browser, load a template, and generate video.
+
+This guide covers both images: one for text-to-video, and one that adds image-to-video on top of it.
+
+<!-- truncate -->
+
+## Two Images, Two Capabilities
+
+| Image Name | What It Does | Models Included |
+|---|---|---|
+| **Barrack ComfyUI - WAN T2V 14B** | Text-to-video generation | WAN 2.1 T2V-14B (fp8), UMT5-XXL text encoder, WAN VAE |
+| **Barrack ComfyUI - WAN T2V-I2V** | Text-to-video + image-to-video generation | Everything above, plus WAN 2.1 I2V-14B models |
+
+**If you only need text-to-video**, deploy the T2V 14B image. **If you also want to generate video from a reference image**, deploy the T2V-I2V image.
+
+Both images ship with:
+
+- **ComfyUI** — node-based visual interface for building generation workflows, serving on port 8188
+- **Gradio interface** — simpler alternative web interface, serving on port 7860
+- **ComfyUI-WanVideoWrapper** — custom node package for WAN 2.1 integration
+- **ComfyUI-VideoHelperSuite** — custom node for video output and combining
+- **Pre-built workflow templates** — ready to load and use immediately
+- **Ubuntu 22.04** with NVIDIA drivers and CUDA pre-configured
+
+All services start automatically on boot.
+
+## Compatible GPUs
+
+Both images are available on the following GPUs:
+
+| GPU | VRAM |
+|---|---|
+| RTX A6000 | 48 GB |
+| L40 | 48 GB |
+| A100 PCIe | 80 GB |
+| H100 PCIe | 80 GB |
+| H100 PCIe NVLink | 80 GB |
+
+The WAN 2.1 T2V-14B model in fp8 quantization fits within 48GB VRAM. Higher-VRAM GPUs like the A100 and H100 provide additional headroom and faster generation. Generation time for a standard clip is approximately 7–10 minutes depending on resolution, frame count, and GPU selected.
+
+## Step 1 — Create an Account
+
+Go to [barrack.ai/signup](https://barrack.ai/signup). Register with email or Google OAuth.
+
+Complete your billing profile at [My Account](https://barrack.ai/account): full name, billing address, postal code, and country. Your billing currency is assigned based on your country.
+
+Purchase credits. Minimum deposit: $5.00 (USD), €5.00 (EUR), or ₹100.00 (INR).
+
+## Step 2 — Deploy the VM
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Select your GPU — both images are compatible with **RTX A6000**, **L40**, **A100 PCIe**, **H100 PCIe**, and **H100 PCIe NVLink**
+3. Set GPU count to **1**
+4. In the **OS Image** dropdown, select either:
+   - **Barrack ComfyUI - WAN T2V 14B** (text-to-video only)
+   - **Barrack ComfyUI - WAN T2V-I2V** (text-to-video + image-to-video)
+5. Create or select an SSH key
+6. Click **Deploy**
+
+The VM enters provisioning within seconds. Wait until the status shows **Active**.
+
+> **Prefer API deployment?** See the [API deployment documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0).
+
+## Step 3 — Find Your IP Address
+
+1. Go to [barrack.ai/dashboard](https://barrack.ai/dashboard)
+2. Click the dropdown at the top of the page
+3. Select your instance
+4. Click **Details**
+5. Your public IP address is displayed there
+
+Public IP is automatically enabled for this image.
+
+## Step 4 — Open ComfyUI
+
+Open your browser and navigate to:
+
+```
+http://YOUR_PUBLIC_IP:8188
+```
+
+This loads the ComfyUI interface. You will see an empty canvas — this is expected. ComfyUI requires you to load a workflow template before you can generate anything.
+
+> **Alternative interface:** A Gradio-based interface is also available at `http://YOUR_PUBLIC_IP:7860`.
+
+## Step 5 — Load a Workflow Template
+
+Workflow templates are pre-installed on the VM. To load one:
+
+1. Click **Workflow** in the top menu
+2. Click **Browse templates** or **Load**
+3. Select a template based on what you want to generate
+
+### Available Templates for T2V (Text-to-Video)
+
+- `wanvideo_T2V_example_02` — standard text-to-video generation
+- `wanvideo_long_T2V_example_01` — extended duration text-to-video
+
+### Additional Templates for T2V-I2V (Image-to-Video)
+
+If you deployed the T2V-I2V image, you also have access to image-to-video templates that accept a reference image as input and generate video from it.
+
+## Step 6 — Generate a Video
+
+After loading a template:
+
+1. Locate the **text prompt node** in the workflow
+2. Enter your prompt describing the video you want to generate
+3. Click **Queue Prompt** or the **Run** button
+4. Wait for generation to complete — approximately 7–10 minutes for a standard clip
+5. The output video appears in the output node and is saved to the VM's filesystem
+
+### Example Prompt
+
+```
+A cat sitting on a windowsill watching rain fall outside, soft lighting, cinematic, 4K
+```
+
+The model generates video at up to 720p resolution with smooth motion and temporal coherence.
+
+## SSH Access
+
+Connect to the VM via SSH if you need terminal access:
+
+```bash
+ssh ubuntu@YOUR_PUBLIC_IP
+```
+
+Generated videos are saved in the ComfyUI output directory:
+
+```bash
+ls ~/ComfyUI/output/
+```
+
+You can download generated files using `scp`:
+
+```bash
+scp ubuntu@YOUR_PUBLIC_IP:~/ComfyUI/output/your_video.mp4 ./
+```
+
+## When to Use This
+
+- **Content creation** — generate short-form video clips for social media, ads, or product demos
+- **Prototyping** — test visual concepts before investing in production shoots
+- **Private generation** — no content moderation filters, no data uploaded to third-party services
+- **Cost control** — per-minute billing, no per-generation fees, no monthly subscriptions
+- **Custom workflows** — ComfyUI's node system lets you build and modify generation pipelines
+
+## WAN 2.1 vs Closed Alternatives
+
+WAN 2.1 is open-source (Apache 2.0) and runs entirely on your infrastructure. Closed alternatives like Sora 2, Veo 3.1, and Seedance 2.0 require subscriptions, impose content restrictions, and process your prompts on external servers. With WAN 2.1 on your own VM, your prompts and outputs stay on your machine.
+
+## Resources
+
+- [WAN 2.1 — Hugging Face](https://huggingface.co/Wan-AI)
+- [ComfyUI — GitHub](https://github.com/comfyanonymous/ComfyUI)
+- [ComfyUI-WanVideoWrapper — GitHub](https://github.com/kijai/ComfyUI-WanVideoWrapper)
+- [Barrack AI Deployment Guide](https://docs.barrack.ai/getting-started-1860209m0)
+- [Barrack AI API Documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0)
+
+## Frequently Asked Questions
+
+### What is WAN 2.1?
+WAN 2.1 is an open-source AI video generation model developed by Alibaba. The T2V-14B variant has 14 billion parameters and generates video from text prompts. The I2V variant generates video from a reference image combined with a text prompt. Both are released under the Apache 2.0 license.
+
+### What is the difference between the T2V 14B and T2V-I2V images?
+The T2V 14B image supports text-to-video generation only — you type a text prompt and the model generates a video clip. The T2V-I2V image includes everything in the T2V image plus image-to-video models, allowing you to provide a reference image as input and generate video based on it.
+
+### Which GPUs can run WAN 2.1 video generation?
+Both images are available on RTX A6000 (48GB), L40 (48GB), A100 PCIe (80GB), H100 PCIe (80GB), and H100 PCIe NVLink (80GB). The model in fp8 quantization fits within 48GB VRAM. Higher-VRAM GPUs provide faster generation times.
+
+### How long does video generation take?
+Approximately 7–10 minutes per clip on an RTX A6000, depending on resolution and frame count. Higher-VRAM GPUs like the H100 reduce generation time.
+
+### Do I need to install anything after deploying the VM?
+No. All models are pre-downloaded, ComfyUI is configured, custom nodes are installed, and workflow templates are ready to load. All services start automatically on boot.
+
+### Does my data leave the VM?
+No. All generation runs locally on your GPU. No prompts, images, or output videos are sent to any external service.
+
+### What resolution and duration can I generate?
+WAN 2.1 T2V-14B generates video at up to 720p resolution. Duration depends on the workflow template — standard templates produce short clips, and the long T2V template supports extended sequences.
+
+### How is this different from Sora, Veo, or Seedance?
+Sora 2, Veo 3.1, and Seedance 2.0 are closed-source services that require subscriptions, impose content moderation, and process your data on external servers. WAN 2.1 is open-source (Apache 2.0), runs entirely on your VM, has no content restrictions, and incurs no per-generation fees.
+
+### What does it cost?
+Barrack AI uses per-minute billing with no contracts. You pay only for the time your VM is running. There are no per-generation fees and no monthly subscriptions. H100 PCIe starts at $1.99/hr.
+
+### How do I deploy via API instead of the dashboard?
+Barrack AI provides a full deployment API. See the [API documentation](https://docs.barrack.ai/create-a-new-instance-27694815e0) for programmatic instance creation, management, and termination.
+
+---
+
+<form name="deploy-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/form-success" style={{background: 'var(--ifm-background-color)', border: '1px solid var(--ifm-color-emphasis-200)', borderRadius: '10px', padding: '22px 20px', marginTop: '24px', marginBottom: '16px'}}>
+  <input type="hidden" name="bot-field" />
+  <input type="hidden" name="form-name" value="deploy-inquiry" />
+  <input type="hidden" name="subject" value="New lead from blog.barrack.ai — deploy-inquiry" />
+  <p style={{fontSize: '14px', fontWeight: 500, color: 'var(--ifm-color-emphasis-600)', marginBottom: '14px'}}>Want to deploy? Have questions?</p>
+  <div style={{display: 'flex', gap: '8px', maxWidth: '400px'}}>
+    <input type="email" name="email" placeholder="you@company.com" required style={{flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--ifm-color-emphasis-200)', background: 'var(--ifm-background-color)', color: 'var(--ifm-font-color-base)', fontSize: '13px'}} />
+    <button type="submit" style={{padding: '8px 18px', borderRadius: '6px', border: 'none', background: 'var(--ifm-font-color-base)', color: 'var(--ifm-background-color)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap'}}>Get in touch</button>
+  </div>
+</form>
+
+---
+
+*Last updated: February 23, 2026*
+
+*Barrack AI provides GPU cloud instances for AI workloads — per-minute billing, no contracts. [Learn more →](https://barrack.ai)*
