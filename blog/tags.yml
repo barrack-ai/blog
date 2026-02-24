@@ -102,3 +102,79 @@ production-outage:
   label: Production Outage
   permalink: /production-outage
   description: AI-caused production outages and incidents
+saas:
+  label: SaaS
+  permalink: /saas
+  description: SaaS business costs, pricing, and unit economics
+costs:
+  label: Costs
+  permalink: /costs
+  description: Software development and infrastructure cost analysis
+ai-tools:
+  label: AI Tools
+  permalink: /ai-tools
+  description: AI coding tools, editors, and development platforms
+infrastructure:
+  label: Infrastructure
+  permalink: /infrastructure
+  description: Cloud infrastructure, hosting, and deployment costs
+wan:
+  label: WAN
+  permalink: /wan
+  description: WAN 2.1 AI video generation model
+video-generation:
+  label: Video Generation
+  permalink: /video-generation
+  description: AI video generation models and workflows
+comfyui:
+  label: ComfyUI
+  permalink: /comfyui
+  description: ComfyUI node-based generation interface
+text-to-video:
+  label: Text-to-Video
+  permalink: /text-to-video
+  description: Text-to-video AI generation
+image-to-video:
+  label: Image-to-Video
+  permalink: /image-to-video
+  description: Image-to-video AI generation
+gpu-cloud:
+  label: GPU Cloud
+  permalink: /gpu-cloud
+  description: GPU cloud infrastructure and compute instances
+flux:
+  label: FLUX
+  permalink: /flux
+  description: FLUX image generation model by Black Forest Labs
+stable-diffusion:
+  label: Stable Diffusion
+  permalink: /stable-diffusion
+  description: Stable Diffusion image generation models
+lora:
+  label: LoRA
+  permalink: /lora
+  description: LoRA fine-tuning and custom model training
+kohya:
+  label: Kohya
+  permalink: /kohya
+  description: Kohya LoRA training toolkit
+image-generation:
+  label: Image Generation
+  permalink: /image-generation
+  description: AI image generation models and workflows
+qwen:
+  label: Qwen
+  permalink: /qwen
+  description: Qwen open-source language models by Alibaba
+llm:
+  label: LLM
+  permalink: /llm
+  description: Large language models and inference
+self-hosted:
+  label: Self-Hosted
+  permalink: /self-hosted
+  description: Self-hosted AI models and local deployment
+open-source:
+  label: Open Source
+  permalink: /open-source
+  description: Open-source AI models and tools
