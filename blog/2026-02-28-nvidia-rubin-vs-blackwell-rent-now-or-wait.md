@@ -126,13 +126,13 @@ For most teams, rent now. Rubin volume cloud availability for non-hyperscaler cu
 
 NVIDIA confirmed Rubin is "in full production" at CES 2026, with first samples shipped to customers in February 2026. Volume production shipments are on track for H2 2026, but hyperscalers (AWS, GCP, Azure) get priority allocation. Independent cloud providers and smaller teams should expect meaningful Rubin availability in mid-2027 at the earliest, based on historical patterns from prior GPU generations.
 
-**How much does B200 cloud rental cost?**
+**How much does it cost to rent a B200 GPU?**
 
-B200 cloud pricing varies by provider tier. Independent GPU cloud platforms offer B200 at $3–$5/hr with per-minute billing and no contracts. For example, [Barrack AI](https://barrack.ai) offers B200 180GB on-demand at $4.69/hr with per-minute billing. Hyperscalers charge significantly more: AWS runs $9–$14/GPU/hr, and GCP lists $18+/hr on-demand. For bare metal dedicated instances with longer commitments, independent providers can offer further discounts.
+[Barrack AI](https://barrack.ai) offers B200 180GB on-demand at $4.69/hr with per-minute billing, zero egress fees, and no contracts. For bare metal dedicated instances with longer commitments, further discounts are available.
 
-**How much does B300 cloud rental cost?**
+**How much does it cost to rent a B300 GPU?**
 
-B300 availability is still limited compared to B200. On independent platforms, on-demand pricing averages $6–$7/hr. [Barrack AI](https://barrack.ai) offers B300 262GB on-demand at $5.89/hr. Hyperscaler B300 pricing ranges up to $18/hr. B300 delivers 55.6% more FP4 compute and 50% more memory than B200, making it the stronger choice for large-model inference workloads where the price premium is justified.
+[Barrack AI](https://barrack.ai) offers B300 262GB on-demand at $5.89/hr with per-minute billing, zero egress fees, and no contracts. For bare metal dedicated instances with longer commitments, further discounts are available. B300 delivers 55.6% more FP4 compute and 50% more memory than B200, making it the stronger choice for large-model inference workloads where the price premium is justified.
 
 **How does B200 compare to H100 in cost per token?**
 
