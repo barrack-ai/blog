@@ -178,3 +178,28 @@ open-source:
   label: Open Source
   permalink: /open-source
   description: Open-source AI models and tools
+
+nvidia:
+  label: NVIDIA
+  permalink: /nvidia
+  description: NVIDIA GPU architecture and platform analysis
+
+blackwell:
+  label: Blackwell
+  permalink: /blackwell
+  description: NVIDIA Blackwell GPU architecture
+
+rubin:
+  label: Rubin
+  permalink: /rubin
+  description: NVIDIA Rubin next-gen GPU platform
+
+b200:
+  label: B200
+  permalink: /b200
+  description: NVIDIA B200 GPU cloud pricing and benchmarks
+
+b300:
+  label: B300
+  permalink: /b300
+  description: NVIDIA B300 Blackwell Ultra GPU
