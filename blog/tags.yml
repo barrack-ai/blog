@@ -203,3 +203,23 @@ b300:
   label: B300
   permalink: /b300
   description: NVIDIA B300 Blackwell Ultra GPU
+
+gpu-memory:
+  label: GPU Memory
+  permalink: /gpu-memory
+  description: HBM and DRAM supply, pricing, and availability for GPU infrastructure
+
+supply-chain:
+  label: Supply Chain
+  permalink: /supply-chain
+  description: Semiconductor supply chain analysis and component availability
+
+h100:
+  label: H100
+  permalink: /h100
+  description: NVIDIA H100 GPU cloud pricing and availability
+
+hbm:
+  label: HBM
+  permalink: /hbm
+  description: High Bandwidth Memory supply and pricing analysis
