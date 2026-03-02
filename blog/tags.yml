@@ -223,3 +223,28 @@ hbm:
   label: HBM
   permalink: /hbm
   description: High Bandwidth Memory supply and pricing analysis
+
+google:
+  label: Google
+  permalink: /google
+  description: Google Cloud Platform security incidents and API vulnerability analysis
+
+gemini:
+  label: Gemini
+  permalink: /gemini
+  description: Google Gemini AI API security and credential exposure
+
+api-keys:
+  label: API Keys
+  permalink: /api-keys
+  description: API key security, privilege escalation, and credential management
+
+vulnerability:
+  label: Vulnerability
+  permalink: /vulnerability
+  description: Security vulnerability disclosure and technical analysis
+
+privilege-escalation:
+  label: Privilege Escalation
+  permalink: /privilege-escalation
+  description: Privilege escalation vulnerabilities and silent permission changes
