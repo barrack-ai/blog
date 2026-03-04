@@ -1,0 +1,409 @@
+---
+title: "CyberStrikeAI: the AI Attack Platform Behind the 600+ FortiGate Breach"
+description: "An open-source AI offensive security platform, built by a developer with ties to China's MSS, was used in a campaign that compromised 600+ FortiGate devices across 55 countries. Full technical breakdown."
+slug: cyberstrikeai-fortigate-breach
+authors: [dhaya]
+image: ./og-cyberstrikeai-fortigate-ai-attack-platform.png
+tags: [ai-security, cybersecurity, fortigate, china, threat-intelligence]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "CyberStrikeAI: the AI Attack Platform Behind the 600+ FortiGate Breach",
+      "description": "An open-source AI offensive security platform, built by a developer with ties to China's MSS, was used in a campaign that compromised 600+ FortiGate devices across 55 countries.",
+      "datePublished": "2026-03-04",
+      "dateModified": "2026-03-04",
+      "author": {
+        "@type": "Person",
+        "name": "Dhayabaran V",
+        "url": "https://www.linkedin.com/in/dhayabaran-v"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Barrack AI",
+        "url": "https://barrack.ai"
+      }
+    })}
+  </script>
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is CyberStrikeAI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CyberStrikeAI is an open-source AI-native offensive security platform written in Go. It integrates over 100 security tools with an AI orchestration engine that accepts any OpenAI-compatible model (GPT, Claude, DeepSeek, etc.) and chains reconnaissance, exploitation, and post-exploitation into conversational commands via MCP (Model Context Protocol)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many FortiGate devices were compromised?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Amazon Threat Intelligence confirmed over 600 FortiGate devices were compromised across more than 55 countries between January 11 and February 18, 2026. Separately, Cyber and Ramen reported that CHECKER2 logs showed 2,500+ devices queued for scanning across 100+ countries, though these were targets queued for access attempts, not confirmed compromises."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Who built CyberStrikeAI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CyberStrikeAI was built by a developer using the GitHub handle Ed1s0nZ. Team Cymru linked Ed1s0nZ to Knownsec 404 (which DomainTools documented as having ties to China's MSS and PLA) and to CNNVD, the vulnerability database operated by the 13th Bureau of China's Ministry of State Security."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Did the FortiGate campaign use zero-day exploits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. According to Amazon's report, no zero-day vulnerabilities were exploited. The entire campaign succeeded by targeting exposed management ports (TCP 443, 8443, 10443, 4443) and weak credentials with single-factor authentication."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the connection between CyberStrikeAI and ARXON or CHECKER2?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ARXON and CHECKER2 are separate tools found on the same server (212.11.64.250) that also ran CyberStrikeAI. ARXON is a custom MCP server the campaign operator built to bridge LLMs with operational infrastructure. CHECKER2 is a Go-based Docker orchestrator for parallel VPN scanning. Both were documented by independent researcher blog Cyber and Ramen, not by Amazon or Team Cymru."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I protect my FortiGate devices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Disable internet-exposed management interfaces immediately. Enforce multi-factor authentication on all admin accounts. Patch to FortiOS 7.6.2, 7.4.7, 7.2.11, 7.0.17, or 6.4.16 minimum. Disable SSL-VPN if not operationally required. Disable FortiCloud SSO if not actively needed. Check for symlinks in SSL-VPN language file directories."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What AI models does CyberStrikeAI support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CyberStrikeAI's AI engine accepts any OpenAI-compatible API endpoint. The default configuration ships with DeepSeek (deepseek-chat). The repository also references GPT-4o in its Quick Start guide and lists Claude (claude-3-opus) as a supported model in config comments. Operators can swap between providers by changing config.yaml."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is CyberStrikeAI still available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "As of March 2026, the CyberStrikeAI repository remains publicly available on GitHub under the Ed1s0nZ account. Team Cymru tracked 21 unique IPs running the platform between January 20 and February 26, 2026, with adoption accelerating."
+          }
+        }
+      ]
+    })}
+  </script>
+</Head>
+
+An open-source AI-powered offensive security platform, built by a developer with documented ties to China's Ministry of State Security, has been linked to a live campaign that compromised over 600 FortiGate devices across 55 countries in five weeks. Three separate investigations -- by Amazon Threat Intelligence, Team Cymru, and independent researcher blog Cyber and Ramen -- have collectively exposed how CyberStrikeAI and custom attacker-built tooling enabled a single, low-skilled operator to breach enterprise network infrastructure at industrial scale.
+
+<!-- truncate -->
+
+This article synthesizes findings from all three sources with precise attribution. Where a claim originates from a specific report, it is identified as such.
+
+---
+
+## Three investigations, one campaign
+
+Understanding this story requires separating three independent but overlapping reports. Each investigated different aspects of the same campaign, and conflating their findings distorts what each actually found.
+
+**Amazon Threat Intelligence (February 20, 2026)** published "AI-augmented threat actor accesses FortiGate devices at scale," authored by CJ Moses, CISO of Amazon Integrated Security. Amazon documented a campaign from January 11 to February 18, 2026, in which a Russian-speaking, financially motivated actor with "low-to-medium baseline technical capability, significantly augmented by AI" compromised **over 600 FortiGate devices across more than 55 countries**. Amazon identified two IOC IPs: 212.11.64[.]250 and 185.196.11[.]225. Amazon's report does not name CyberStrikeAI, ARXON, CHECKER2, HexStrike AI, Claude, or DeepSeek. It refers only to "multiple commercial generative AI services" and "at least two distinct commercial LLM providers."
+
+**Team Cymru (~March 2, 2026)**, authored by Will Thomas, describes how Amazon shared the IP 212.11.64[.]250. Team Cymru's Scout platform detected a **"CyberStrikeAI" banner** running on port 8080 of that server. NetFlow analysis confirmed communications between this IP and FortiGate targets Amazon had identified. Team Cymru then tracked **21 unique IP addresses** running CyberStrikeAI between January 20 and February 26, 2026, primarily hosted in China, Singapore, and Hong Kong. Team Cymru also linked the developer Ed1s0nZ to Knownsec 404 and CNNVD. Team Cymru's report does not mention ARXON, CHECKER2, or HexStrike AI.
+
+**Cyber and Ramen (cyberandramen.net, February 21, 2026)** is the source for the most granular technical details about the campaign operator's infrastructure. This independent researcher blog documented ARXON, CHECKER2, and HexStrike AI on the exposed server. It identified Claude and DeepSeek by name as the LLM providers used. It reported "over 1,400 files across 139 subdirectories" of operational artifacts. And it described CHECKER2 logs showing 2,500+ FortiGate appliances queued for scanning across 100+ countries -- these were targets queued for automated access attempts, not confirmed compromises.
+
+Every claim in this article is attributed to its actual source.
+
+---
+
+## What CyberStrikeAI actually is
+
+CyberStrikeAI is an open-source offensive security platform hosted on GitHub under the developer handle Ed1s0nZ. Its README describes it as "an AI-native security testing platform built in Go" that integrates "100+ security tools, an intelligent orchestration engine, role-based testing with predefined security roles, a skills system with specialized testing skills, and comprehensive lifecycle management capabilities."
+
+The platform is written primarily in **Go (59.7%)** with a JavaScript/CSS/HTML frontend (28.1%, 8.6%, 3.4%), plus shell scripts. The architecture follows a clean separation: `cmd/` contains server and MCP stdio entrypoints, `internal/` houses the agent core, MCP implementation, handlers, and security executor, `web/` serves the single-page application dashboard, and `tools/` contains **YAML-based tool recipes** that can be hot-reloaded at runtime without restarting the platform.
+
+### AI model support
+
+The AI decision engine accepts any **OpenAI-compatible API endpoint**. The default configuration ships with DeepSeek (`deepseek-chat` at `https://api.deepseek.com/v1`), configured via `config.yaml` with `api_key`, `base_url`, and `model` fields. The Quick Start guide uses GPT-4o as its example. Claude (`claude-3-opus`) appears in config comments as a supported model. This model-agnostic design means operators can swap between AI providers depending on the task.
+
+### MCP integration
+
+The **MCP (Model Context Protocol) integration** is where CyberStrikeAI becomes dangerous at scale. MCP, introduced by Anthropic in November 2024, functions as a standardized interface between AI models and external tools. CyberStrikeAI implements it natively across three transport modes: **HTTP** (request/response for the web UI), **stdio** (process-based, enabling integration with Cursor and CLI environments), and **SSE** (Server-Sent Events for streaming output). The platform also supports **external MCP federation** -- operators can register third-party MCP servers from the dashboard and toggle them per engagement, with real-time health and call monitoring. CyberStrikeAI is not limited to its built-in tools; it can orchestrate any MCP-compatible service on the internet.
+
+### The 100+ integrated security tools
+
+The tool inventory confirmed in the GitHub repository spans every phase of the kill chain:
+
+- **Network scanning**: nmap, masscan, rustscan, arp-scan, nbtscan
+- **Web and application testing**: sqlmap, nikto, dirb, gobuster, feroxbuster, ffuf, httpx
+- **Vulnerability scanning**: nuclei, wpscan, wafw00f, dalfox, xsser
+- **Subdomain enumeration**: subfinder, amass, findomain, dnsenum, fierce
+- **Network space search engines**: fofa_search, zoomeye_search
+- **API security**: graphql-scanner, arjun, api-fuzzer, api-schema-analyzer
+- **Container security**: trivy, clair, docker-bench-security, kube-bench, kube-hunter
+- **Cloud security**: prowler, scout-suite, cloudmapper, pacu, terrascan, checkov
+- **Binary analysis**: gdb, radare2, ghidra, objdump, strings, binwalk
+- **Exploitation**: metasploit, msfvenom, pwntools, ropper, ropgadget
+- **Password cracking**: hashcat, john, hashpump
+- **Forensics**: volatility, volatility3, foremost, steghide, exiftool
+- **Post-exploitation**: linpeas, winpeas, mimikatz, bloodhound, impacket, responder
+- **CTF utilities**: stegsolve, zsteg, hash-identifier, fcrackzip, pdfcrack, cyberchef
+- **System helpers**: exec, create-file, delete-file, list-files, modify-file
+
+Each tool has a YAML recipe defining its invocation pattern, expected output format, and how the AI agent should interpret results. The agent reasons over findings across tools, automatically chains results from one tool into the next, and falls back to alternatives when one is unavailable. Large results exceeding 200KB are stored as paginated artifacts with filtering and regex search.
+
+### Web dashboard and operational features
+
+The password-protected web UI (SQLite-backed with audit logging) provides system runtime status, vulnerability management with CRUD operations, severity tracking, status workflows, and statistics dashboards. Operators interact through a **conversational testing interface** -- type a natural-language prompt, and the AI translates it into a multi-step attack sequence with streaming SSE output.
+
+The **role-based testing system** offers predefined security roles (penetration tester, CTF player, web application scanner) with custom prompts and tool restrictions. The **skills system** includes 20+ specialized testing skills (SQL injection, API security, and others) that AI agents can invoke on demand. The platform also integrates with **DingTalk and Lark (Feishu)** chatbots, enabling mobile-based operation through Chinese enterprise messaging apps.
+
+CyberStrikeAI generates **attack-chain graphs** -- interactive visualizations showing targets, tools used, vulnerabilities discovered, and their relationships. Each chain includes risk scoring and step-by-step replay. Export pipelines push findings to external reporting systems.
+
+---
+
+## The FortiGate campaign: what Amazon found
+
+Amazon Threat Intelligence detected the campaign and published findings on February 20, 2026. CJ Moses, CISO of Amazon Integrated Security, described a Russian-speaking, financially motivated threat actor whose skill level the report formally assessed as "low-to-medium baseline technical capability, significantly augmented by AI." The full assessment states that the actor "can run standard offensive tools and automate routine tasks but struggles with exploit compilation, custom development, and creative problem-solving during live operations."
+
+The campaign compromised **over 600 FortiGate devices across more than 55 countries** between January 11 and February 18, 2026.
+
+The attack methodology was simple. **No zero-day vulnerabilities were exploited.** The campaign succeeded entirely by targeting **exposed management ports** (TCP 443, 8443, 10443, and 4443) and **weak credentials with single-factor authentication**. Moses described the operator's capability as analogous to "an AI-powered assembly line for cybercrime, helping less skilled workers produce at scale."
+
+Amazon identified two IOC IPs: **212.11.64[.]250** and **185.196.11[.]225**. Amazon's report uses the phrase "multiple commercial generative AI services" and references "at least two distinct commercial LLM providers" but does not name them.
+
+### Post-exploitation chain (per Amazon)
+
+After gaining access through FortiGate VPN credentials, the attacker followed a systematic post-exploitation path. Stolen device configurations (including credentials, network topology, firewall policies, and IPsec VPN peer configs) were parsed and decrypted using AI-assisted Python scripts. Target networks were ingested, classified by size, and subjected to service discovery using **gogo** (an open-source port scanner). SMB hosts and domain controllers were identified, then hit with vulnerability scanning via **Nuclei**.
+
+Domain compromise followed through **Meterpreter** with the **mimikatz module** for **DCSync attacks** -- extracting full Active Directory credential databases. Lateral movement relied on pass-the-hash, pass-the-ticket, and NTLM relay techniques. The attacker specifically targeted **Veeam Backup & Replication servers**, exploiting CVE-2023-27532 and CVE-2024-40711 to access backup credential stores -- the last line of defense for most organizations against ransomware.
+
+The geographic concentration of victims spanned South Asia, Latin America, the Caribbean, West Africa, Northern Europe, and Southeast Asia. Multiple devices from the same organizations were frequently compromised together. Operational security was notably poor: detailed operational plans, credentials, and victim data were stored unencrypted alongside tooling.
+
+---
+
+## What Cyber and Ramen found on the exposed server
+
+The independent researcher blog Cyber and Ramen (cyberandramen.net) published a detailed analysis on February 21, 2026, examining the exposed server at 212.11.64[.]250. This is the source for the most granular technical details about the campaign operator's custom infrastructure.
+
+The server contained over **1,400 files across 139 subdirectories**, including CVE exploit code, stolen FortiGate configuration files, Nuclei scanning templates, Veeam credential extraction tools, BloodHound collection data, and AI-generated operational plans. Folders labeled "claude" and "claude-0" contained Claude outputs and prompt histories.
+
+Three distinct tools were documented on the server, all separate from CyberStrikeAI itself:
+
+**ARXON** -- a custom Model Context Protocol server that served as the bridge between LLMs and operational infrastructure. ARXON processed scan results automatically, invoked DeepSeek to generate structured attack plans, fed tasks to Claude for execution, and maintained a growing knowledge base that improved attack planning with each successive target. ARXON is custom attacker-built infrastructure, not a component of CyberStrikeAI.
+
+**CHECKER2** -- a Go-based, Docker-deployed orchestrator for parallel VPN scanning and target processing. CHECKER2 logs showed **2,500+ FortiGate appliances across 100+ countries queued for automated access attempts**. This figure represents targets queued for scanning, not confirmed compromises. Amazon's confirmed compromise count is the separate and lower figure of 600+ devices across 55+ countries. CHECKER2 is also separate from CyberStrikeAI.
+
+**HexStrike AI** -- an open-source red teaming MCP framework created by researcher Muhammad Osama, integrating 150+ security tools. A prior exposure of the same server in December 2025 revealed it had previously hosted HexStrike AI. The campaign operator appears to have evolved from HexStrike to custom ARXON/CHECKER2 tools over approximately eight weeks. HexStrike AI is a predecessor found on the same server, not a component of CyberStrikeAI.
+
+### The AI service split
+
+According to Cyber and Ramen's analysis, the operator split AI workloads deliberately. **DeepSeek** handled attack planning and strategy generation from reconnaissance data. **Claude** handled vulnerability assessment and direct execution of offensive tools on victim systems. Cyber and Ramen described a Claude Code configuration file that pre-approved Claude Code to autonomously run Impacket (secretsdump, psexec, wmiexec), Metasploit, and hashcat using hardcoded domain credentials. In this configuration, Claude was not an advisory tool -- it was an active participant in the exploitation chain.
+
+As Cyber and Ramen's researcher wrote: "What sets this activity apart is the integration of LLMs: a (likely) single operator managing simultaneous intrusions across multiple countries with analytical support at every stage."
+
+---
+
+## How Team Cymru connected CyberStrikeAI to the campaign
+
+Team Cymru's investigation, published around March 2, 2026, provided the link between the FortiGate campaign and CyberStrikeAI specifically.
+
+Amazon shared the IP 212.11.64[.]250. When Will Thomas ran it through Team Cymru Scout's open port scan data, the server revealed a distinctive **CyberStrikeAI banner running on port 8080**. NetFlow analysis confirmed communications between this IP and the FortiGate targets Amazon had identified.
+
+Team Cymru then tracked adoption across the broader internet. From January 20 to February 26, 2026, they observed **21 unique IP addresses** running CyberStrikeAI. Adoption was minimal around the repository's creation date (November 8, 2025), but accelerated sharply -- with **5 new IPs appearing on a single day** (February 26, 2026).
+
+The servers clustered overwhelmingly in Chinese-speaking locales: **9 IPs in mainland China** (Tencent, Alibaba, Huawei Cloud, China Telecom), **5 in Singapore**, **3 in the US**, **1 in Hong Kong**, **1 in Japan**, and **1 in Switzerland**. Team Cymru assessed that "strong adoption among Chinese-speaking threat actors" will continue and that the tool "may be leveraged by Chinese state-sponsored advanced persistent threats (APTs)."
+
+Team Cymru also warns that CyberStrikeAI's distinctive port banner on port 8080 is detectable in network scanning data, but "operators may begin modifying or suppressing this banner as awareness of the tracking methodology spreads."
+
+---
+
+## Who is Ed1s0nZ and what are his ties to the Chinese state
+
+The developer behind CyberStrikeAI operates under the GitHub handle **Ed1s0nZ** (display name: 公明 / Gong Ming), maintaining **33 public repositories** with 372 followers. The profile lists an email (zhaoyf1104@gmail.com), a WeChat handle (z1fan7), and a UTC+08:00 timezone. The bio reads: "As a security researcher passionate about technology, everything shared here is purely for research and learning. Let's use knowledge to protect safety -- and please, never use it for anything illegal."
+
+Beyond CyberStrikeAI, Ed1s0nZ's repository portfolio reveals a developer deeply embedded in offensive security and AI:
+
+**PrivHunterAI** (~323 stars) uses a passive proxy approach with mainstream AI models (Kimi, DeepSeek, GPT) to detect privilege escalation vulnerabilities. **InfiltrateX** (~74 stars) automates privilege escalation scanning. **ChatGPTJailbreak** contains prompts to bypass OpenAI's safety filters by forcing ChatGPT into "Do Anything Now" (DAN) mode. **watermark-tool** adds invisible steganographic watermarks to documents -- useful for tracking leaked documents. **VigilantEye** is a Golang-based database sensitive information monitoring tool that watches for disclosure of PII (phone numbers, ID card numbers) and sends alerts via WeChat Work bot. **AIMergeBot** uses ReAct + MCP architecture for automated code security review of merge/pull requests. **banana_blackmail** is a functional file-encrypting ransomware written in Go -- files are encrypted with a random AES key (RSA-encrypted) and receive a `.banana` extension, with Volume Shadow Copy deletion and backup destruction included. The repo carries an educational disclaimer.
+
+### The Knownsec 404 and CNNVD connections
+
+On **December 19, 2025**, Ed1s0nZ submitted CyberStrikeAI to **Knownsec 404's Starlink Project** (GitHub issue #190 on the knownsec/404StarLink repository). The issue was closed, indicating acceptance. Knownsec 404's Starlink Project, launched in 2020, positions itself as linking security researchers through open-source tools. Its parent organization, Knownsec, operates ZoomEye (an internet-scanning platform) and maintains extensive government relationships.
+
+DomainTools published an assessment of Knownsec in January 2026 following a leak of 12,000+ internal documents, concluding that the company "has a shadow organization that works for the PLA, MSS, and the organs of the Chinese security state." Leaked documents revealed Knownsec maintains an integrated espionage stack including **TargetDB** (a critical infrastructure target database covering ~378,942,040 IPs, 3,482,468 domains, and 24,241 organizations across 26 regions), **GhostX** (browser exploitation, keylogging, credential theft, and Windows trojan modules), and **Un-Mail** (an email eavesdropping system using XSS to steal login credentials).
+
+On **January 5, 2026**, Ed1s0nZ added a line to their GitHub profile (commit `2b8a84e689e9fe2fdad517c7e196604ef33cf76b`) stating: "CNNVD 2024 Vulnerability Reward Program -- Level 2 Contribution Award (Individual)."
+
+CNNVD (China National Vulnerability Database of Information Security) is run by **CNITSEC** -- the 13th Bureau of China's **Ministry of State Security (MSS)**, the country's foreign intelligence service. Bitsight's research describes the CNNVD Vulnerability Reward Program as functioning as "a vehicle for the CCP to collect zero days before they are publicly disclosed."
+
+After reporting surfaced these connections, Team Cymru noticed Ed1s0nZ **removed the CNNVD reference** from their GitHub profile (commit `5c806c2580fadd9b564b9d32b0db3364dfd0349e`). As Will Thomas wrote: "The developer's recent attempt to scrub references to the CNNVD from their GitHub profile points to an active effort to obscure these state ties, likely to protect the tool's operational viability as its popularity grows."
+
+---
+
+## China's vulnerability databases as a strategic weapon
+
+Bitsight's TRACE research team published **"Red Vulns Rising"** on February 18, 2026, analyzing China's two national vulnerability databases against the Western CVE/NVD system. The findings illuminate why Ed1s0nZ's CNNVD award matters.
+
+CNNVD is operated by CNITSEC (13th Bureau, MSS). A separate database, **CNVD**, is controlled by CNCERT under the Ministry of Industry and Information Technology (MIIT). Bitsight found approximately **1,400 vulnerabilities** that appear in CNNVD and CNVD well before they are recorded in CVE/NVD -- sometimes by several months. This creates exploitation windows where Western defenders are completely blind to known threats.
+
+Recorded Future's earlier research found that CNNVD takes longer to publish high-CVSS-score vulnerabilities compared to lower-severity ones -- suggesting deliberate withholding of the most dangerous bugs for intelligence exploitation. China's **2021 Regulation on the Management of Network Product Security Vulnerabilities (RMSV)** mandates reporting flaws to MIIT within 48 hours of discovery and bans pre-patch public disclosure, effectively creating a state-controlled pipeline from vulnerability discovery to offensive use.
+
+A developer who receives awards from CNNVD's vulnerability reward program operates within a system designed to funnel zero-days to China's intelligence apparatus. Whether Ed1s0nZ's contributions fed directly into offensive operations is unconfirmed, but the institutional infrastructure exists for precisely that purpose.
+
+---
+
+## FortiGate's long history of being targeted at scale
+
+The CyberStrikeAI-linked campaign did not happen in a vacuum. FortiGate appliances have been systematically targeted since at least 2022, creating an attack surface that AI tools now exploit with devastating efficiency.
+
+**CVE-2022-42475** (CVSS 9.3) -- a heap-based buffer overflow in FortiOS SSL-VPN, disclosed December 12, 2022. Exploited as a zero-day by Chinese state-sponsored actors including Volt Typhoon, with Mandiant identifying custom "BOLDMOVE" malware deployed on compromised devices.
+
+**CVE-2023-27997** (CVSS 9.2-9.8), nicknamed "XORtigate" by discoverers Charles Fol and Dany Bach of Lexfo Security -- a heap-based buffer overflow in FortiOS/FortiProxy SSL-VPN allowing pre-authentication remote code execution, even bypassing MFA. Bishop Fox found 330,000 of 490,000 exposed devices (69%) remained unpatched weeks after disclosure.
+
+**CVE-2024-21762** (CVSS 9.6-9.8) -- an out-of-bounds write in the FortiOS SSL-VPN daemon (`sslvpnd`), disclosed February 8, 2024. Added to CISA's Known Exploited Vulnerabilities catalog within 24 hours.
+
+**CVE-2024-55591** (CVSS 9.8) -- authentication bypass via crafted requests to the Node.js websocket module in FortiOS and FortiProxy, granting super-admin privileges. Disclosed January 14, 2025. Exploited as a zero-day since November 2024 by the "Mora_001" ransomware actor deploying "SuperBlack" ransomware.
+
+**CVE-2025-59718** and **CVE-2025-59719** (CVSS 9.1-9.8) -- improper verification of cryptographic signatures enabling FortiCloud SSO bypass via crafted SAML responses. Disclosed December 9, 2025. Arctic Wolf observed exploitation from December 12, 2025. Added to CISA KEV December 16, 2025.
+
+**CVE-2026-24858** (CVSS 9.4-9.8) -- authentication bypass in FortiOS, FortiManager, and FortiAnalyzer via FortiCloud SSO. Published January 27, 2026. Confirmed under active zero-day exploitation. Fortinet temporarily disabled all FortiCloud SSO authentication on January 26, 2026.
+
+In **April 2025**, Fortinet disclosed a persistence technique where attackers created symlinks in SSL-VPN language file directories that connected the user filesystem to the root filesystem. These symlinks survived firmware updates, enabling persistent read-only access to device configurations. The Shadowserver Foundation tracked **16,620 compromised devices**. CERT-FR revealed the technique had been used since early 2023.
+
+In **January 2025**, a threat actor called "Belsen Group" published configuration files and VPN credentials for over **15,000 FortiGate firewalls** on the dark web. The data was collected around October 2022 via CVE-2022-40684. Kevin Beaumont independently verified the dump.
+
+The CyberStrikeAI-linked campaign did not need any of these CVEs. It succeeded purely through exposed management ports and weak credentials -- the lowest-hanging fruit, harvested at scale by AI.
+
+---
+
+## How AI offensive tools change the threat model
+
+CyberStrikeAI represents a qualitative shift from traditional exploit kits. Traditional tools operate on fixed logic: script-based automation, static payloads, manual target selection, single-phase attacks. CyberStrikeAI introduces **adaptive AI decision-making** across the entire kill chain. The AI parses reconnaissance results, generates attack plans, selects appropriate tools, chains their outputs, and adjusts strategy based on what it discovers -- all from natural-language prompts.
+
+David Shipley, CEO and Co-Founder of Beauceron Security, described this to CSO Online as analogous to going "from muskets to AK-47s," adding: "Making this kind of tooling available as public open source, given its sophistication and the ability to cause real harm, is irresponsible."
+
+The key differentiator is not sophistication -- it is **scale multiplication**. The FortiGate campaign demonstrated that a single operator with low-to-medium skills could manage simultaneous intrusions across multiple countries. Amazon formally assessed the operator as someone who "can run standard offensive tools and automate routine tasks but struggles with exploit compilation, custom development, and creative problem-solving during live operations." AI removed the ceiling on what that skill level could achieve.
+
+Check Point Research documented CyberStrikeAI's predecessor, HexStrike AI, being discussed for weaponization in dark web channels in early September 2025. Aaron Rose of Check Point stated that "HexStrike AI is a turning point because it collapses the barrier to entry for complex exploits." Check Point also noted actual use in attacks "hasn't been confirmed" beyond dark web discussion at that time.
+
+As Shipley warned: "We're in a lot of trouble in 2026, and this is only one of the tools hitting the streets."
+
+---
+
+## Indicators of compromise and detection
+
+### IOC table: all 21 CyberStrikeAI servers (source: Team Cymru)
+
+| IP Address | Location | ASN / Organization | Last Seen |
+|---|---|---|---|
+| 212.11.64.250 | Switzerland | SWISSNETWORK02 | 01/30/2026 |
+| 106.52.47.65 | China | Tencent | 02/25/2026 |
+| 115.120.233.95 | China | Huawei Cloud | 02/26/2026 |
+| 117.72.103.145 | China | China Telecom | 02/23/2026 |
+| 118.25.186.119 | China | Tencent | 02/24/2026 |
+| 47.95.33.207 | China | Alibaba | 02/26/2026 |
+| 47.101.186.156 | China | Alibaba | 02/25/2026 |
+| 62.234.61.215 | China | Tencent | 02/25/2026 |
+| 81.70.144.252 | China | Tencent | 02/26/2026 |
+| 60.204.227.64 | China | Huawei Cloud | 02/08/2026 |
+| 103.164.81.110 | Singapore | Scloud Pte Ltd | 02/02/2026 |
+| 146.190.195.154 | Singapore | DigitalOcean | 01/23/2026 |
+| 146.190.82.132 | Singapore | DigitalOcean | 01/24/2026 |
+| 43.106.25.225 | Singapore | Alibaba | 01/31/2026 |
+| 43.167.237.212 | Singapore | Tencent | 02/01/2026 |
+| 142.171.160.137 | US | MULTACOM | 01/29/2026 |
+| 144.31.224.253 | US | PLAY2GO-NET | 02/26/2026 |
+| 38.38.250.182 | US | LUCIDACLOUD | 01/25/2026 |
+| 154.219.114.92 | Hong Kong | COGNETCLOUD | 02/12/2026 |
+| 64.176.48.93 | Japan | Vultr | 02/24/2026 |
+| 2400:d321:2308:1461::1 | Singapore | Contabo Asia | 02/26/2026 |
+
+Amazon also identified **185.196.11.225** as additional threat actor infrastructure (first seen 01/11/2026, last seen 02/18/2026).
+
+### Detection guidance
+
+Amazon recommends behavioral monitoring over IOC-based detection, since the tools used (Impacket, gogo, Nuclei) are dual-use. Priority detection targets include: DCSync operations (Windows Event ID 4662), new scheduled tasks mimicking Windows service names, unusual remote management connections from VPN address pools, LLMNR/NBT-NS poisoning activity, and unauthorized access to Veeam backup credential stores.
+
+### FortiGate hardening -- immediate action items
+
+**Disable internet-exposed management interfaces.** This single step would have prevented the entire 600+ device campaign. Management access should never be available on WAN interfaces (HTTPS, SSH, HTTP, Telnet). Use dedicated management VLANs accessible only from trusted internal networks, or VPN-only access for remote administration.
+
+**Enforce multi-factor authentication** on all administrator accounts using FortiToken or equivalent. The campaign succeeded against single-factor credentials -- MFA stops this attack vector cold. Configure trusted hosts for every admin account to restrict login source IPs. Implement local-in policies (configurable via GUI from FortiOS v7.6.0) to restrict which addresses can reach management services.
+
+**Patch aggressively.** Current recommended minimum versions are FortiOS 7.6.2, 7.4.7, 7.2.11, 7.0.17, or 6.4.16. If SSL-VPN is not operationally required, disable it entirely -- it has been the target of the most critical exploited vulnerabilities in FortiGate's history. Disable FortiCloud SSO if not actively needed, as it has been the vector for multiple recent authentication bypass vulnerabilities.
+
+**Monitor for persistence.** Check for symlinks in SSL-VPN language file directories (the April 2025 persistence technique survives firmware updates). Audit admin accounts for rogue entries -- Volt Typhoon campaigns created accounts named "fortinet-tech-support" and "fortigate-tech-support." Review all FortiCloud SSO login activity and configuration exports.
+
+---
+
+## Conclusion: the proliferation problem is already here
+
+CyberStrikeAI is not a proof of concept. It is an operational weapon that has been linked to a campaign compromising hundreds of enterprise network devices across dozens of countries. Its developer has documented ties to two organizations affiliated with China's MSS -- Knownsec 404 and the CNNVD -- and actively attempted to conceal those connections when attention increased. The tool is open source, freely available, deployed on infrastructure predominantly in China and Chinese-speaking regions, and growing.
+
+The FortiGate campaign proved that AI does not need to make attacks more sophisticated to be transformative. It needs to make them more scalable. A single operator with mediocre skills managed simultaneous intrusions across continents because AI handled the analytical heavy lifting at every stage -- planning, execution, pivoting, credential extraction. The attack required no zero-days, no custom exploits, no nation-state resources. Just exposed management ports, weak passwords, and an AI copilot.
+
+CyberStrikeAI grew from zero deployments to 21 active servers in under two months. Team Cymru anticipates adoption by Chinese APT groups. The AI offensive toolkit ecosystem is open source, accelerating, and already beyond theoretical concern. The time to harden edge infrastructure was before this article. The next best time is now.
+
+---
+
+## Frequently asked questions
+
+### What is CyberStrikeAI?
+
+CyberStrikeAI is an open-source AI-native offensive security platform written in Go. It integrates over 100 security tools with an AI orchestration engine that accepts any OpenAI-compatible model (GPT, Claude, DeepSeek, etc.) and chains reconnaissance, exploitation, and post-exploitation into conversational commands via MCP (Model Context Protocol). The repository is hosted on GitHub under the developer handle Ed1s0nZ.
+
+### How many FortiGate devices were compromised?
+
+Amazon Threat Intelligence confirmed over 600 FortiGate devices were compromised across more than 55 countries between January 11 and February 18, 2026. Separately, Cyber and Ramen reported that CHECKER2 logs showed 2,500+ devices queued for scanning across 100+ countries. These are two different figures from two different sources: 600+ confirmed compromises (Amazon) versus 2,500+ queued targets (Cyber and Ramen).
+
+### Who built CyberStrikeAI?
+
+CyberStrikeAI was built by a developer using the GitHub handle Ed1s0nZ. Team Cymru linked Ed1s0nZ to Knownsec 404 (which DomainTools documented as having ties to China's MSS and PLA based on a leak of 12,000+ internal documents) and to CNNVD, the vulnerability database operated by the 13th Bureau of China's Ministry of State Security.
+
+### Did the FortiGate campaign use zero-day exploits?
+
+No. According to Amazon's report, no zero-day vulnerabilities were exploited. The entire campaign succeeded by targeting exposed management ports and weak credentials with single-factor authentication.
+
+### What is the connection between CyberStrikeAI and ARXON or CHECKER2?
+
+ARXON and CHECKER2 are separate tools found on the same server (212.11.64.250) that also ran CyberStrikeAI. ARXON is a custom MCP server the campaign operator built to bridge LLMs with operational infrastructure. CHECKER2 is a Go-based Docker orchestrator for parallel VPN scanning. Both were documented by independent researcher blog Cyber and Ramen, not by Amazon or Team Cymru. They are not components of CyberStrikeAI.
+
+### How can I protect my FortiGate devices?
+
+Disable internet-exposed management interfaces immediately. Enforce multi-factor authentication on all admin accounts. Patch to FortiOS 7.6.2, 7.4.7, 7.2.11, 7.0.17, or 6.4.16 minimum. Disable SSL-VPN if not operationally required. Disable FortiCloud SSO if not actively needed. Check for symlinks in SSL-VPN language file directories. Audit admin accounts for rogue entries.
+
+### What AI models does CyberStrikeAI support?
+
+CyberStrikeAI's AI engine accepts any OpenAI-compatible API endpoint. The default configuration ships with DeepSeek (deepseek-chat). The repository also references GPT-4o in its Quick Start guide and lists Claude (claude-3-opus) as a supported model in config comments. Operators can swap between providers by changing config.yaml.
+
+### Is CyberStrikeAI still available?
+
+As of March 2026, the CyberStrikeAI repository remains publicly available on GitHub under the Ed1s0nZ account. Team Cymru tracked 21 unique IPs running the platform between January 20 and February 26, 2026, with adoption accelerating. Five new IPs appeared on a single day (February 26).
+
+---
+
+### Sources
+
+- [Amazon Threat Intelligence: AI-augmented threat actor accesses FortiGate devices at scale (February 20, 2026)](https://aws.amazon.com/blogs/security/ai-augmented-threat-actor-accesses-fortigate-devices-at-scale/)
+- [Team Cymru: Tracking CyberStrikeAI Usage (~March 2, 2026)](https://www.team-cymru.com/post/tracking-cyberstrikeai-usage)
+- [Cyber and Ramen: Campaign analysis (February 21, 2026)](https://cyberandramen.net)
+- [DomainTools: The Knownsec Leak (January 2026)](https://dti.domaintools.com/research/the-knownsec-leak-yet-another-leak-of-chinas-contractor-driven-cyber-espionage-ecosystem)
+- [Bitsight: Red Vulns Rising (February 18, 2026)](https://www.bitsight.com/blog/chinese-vulnerability-database-analysis-cnvd-cnnvd)
+- [CSO Online: AI-powered attack kits go open source (March 3, 2026)](https://www.csoonline.com)
+- [CyberStrikeAI GitHub Repository](https://github.com/Ed1s0nZ/CyberStrikeAI)
+
+---
+
+*Last updated: March 4, 2026*
+
+*[barrack.ai](https://barrack.ai) provides isolated GPU cloud instances for AI and security workloads. Zero egress fees, per-minute billing, H100 to B300 GPUs available. [Learn more.](https://barrack.ai)*

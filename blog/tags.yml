@@ -244,7 +244,22 @@ vulnerability:
   permalink: /vulnerability
   description: Security vulnerability disclosure and technical analysis
 
-privilege-escalation:
-  label: Privilege Escalation
-  permalink: /privilege-escalation
-  description: Privilege escalation vulnerabilities and silent permission changes
+cybersecurity:
+  label: Cybersecurity
+  permalink: /cybersecurity
+  description: Cybersecurity incidents and analysis
+
+fortigate:
+  label: FortiGate
+  permalink: /fortigate
+  description: Fortinet FortiGate security
+
+china:
+  label: China
+  permalink: /china
+  description: China cyber operations
+
+threat-intelligence:
+  label: Threat Intelligence
+  permalink: /threat-intelligence
+  description: Threat intelligence and IOCs
