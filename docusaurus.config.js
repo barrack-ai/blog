@@ -2,8 +2,8 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 
 const config = {
-  title: 'Barrack.ai',
-  tagline: 'Personalized GPU Computing for AI Workloads',
+  title: 'Barrack AI',
+  tagline: 'The Bare Metal GPU Cloud',
   favicon: 'img/favicon.svg',
   url: 'https://blog.barrack.ai',
   baseUrl: '/',
@@ -31,8 +31,8 @@ const config = {
         blog: {
           routeBasePath: '/',
           showReadingTime: true,
-          blogTitle: 'Barrack.ai Blog',
-          blogDescription: 'Insights on GPU computing, AI infrastructure, and cloud cost optimization',
+          blogTitle: 'Barrack AI Blog',
+          blogDescription: 'Bare metal NVIDIA GPUs. Guides, benchmarks, and AI infrastructure insights.',
           blogSidebarCount: 'ALL',
           blogSidebarTitle: 'Recent posts',
         },
