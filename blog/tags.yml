@@ -263,3 +263,15 @@ threat-intelligence:
   label: Threat Intelligence
   permalink: /threat-intelligence
   description: Threat intelligence and IOCs
+ai-coding-tools:
+  label: AI Coding Tools
+  permalink: /ai-coding-tools
+  description: Security research on AI-powered coding assistants and IDE extensions
+vscode:
+  label: VS Code
+  permalink: /vscode
+  description: Visual Studio Code extension security and vulnerabilities
+prompt-injection:
+  label: Prompt Injection
+  permalink: /prompt-injection
+  description: Prompt injection attacks targeting AI agents and LLM applications
