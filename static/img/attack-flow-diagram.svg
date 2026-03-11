@@ -206,5 +206,5 @@
 
   <!-- Footer -->
   <text x="600" y="668" text-anchor="middle" fill="#4b5563" font-size="11">Four products. Four vendors. One architectural flaw: AI agents with broad permissions processing untrusted input.</text>
-  <text x="600" y="688" text-anchor="middle" fill="#374151" font-size="10">barrack.ai / blog.barrack.ai</text>
+  <text x="40" y="688" fill="#e0eacc" font-size="11" font-weight="600">Dhayabaran V</text><text x="1160" y="688" text-anchor="end" fill="#374151" font-size="10">blog.barrack.ai</text>
 </svg>
