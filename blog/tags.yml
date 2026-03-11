@@ -275,3 +275,23 @@ prompt-injection:
   label: Prompt Injection
   permalink: /prompt-injection
   description: Prompt injection attacks targeting AI agents and LLM applications
+
+copilot:
+  label: Copilot
+  permalink: /copilot
+  description: Microsoft Copilot and AI assistant security research
+
+chrome:
+  label: Chrome
+  permalink: /chrome
+  description: Google Chrome browser security and vulnerability analysis
+
+microsoft:
+  label: Microsoft
+  permalink: /microsoft
+  description: Microsoft product security incidents and patch analysis
+
+perplexity:
+  label: Perplexity
+  permalink: /perplexity
+  description: Perplexity AI browser and agent security research
