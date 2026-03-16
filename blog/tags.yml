@@ -295,3 +295,19 @@ perplexity:
   label: Perplexity
   permalink: /perplexity
   description: Perplexity AI browser and agent security research
+
+
+gtc-2026:
+  label: GTC 2026
+  permalink: /gtc-2026
+  description: NVIDIA GTC 2026 conference coverage and announcements
+
+inference:
+  label: Inference
+  permalink: /inference
+  description: AI inference optimization, cost analysis, and GPU benchmarks
+
+ml-infrastructure:
+  label: ML Infrastructure
+  permalink: /ml-infrastructure
+  description: Machine learning infrastructure, GPU clusters, and deployment
