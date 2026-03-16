@@ -311,3 +311,23 @@ ml-infrastructure:
   label: ML Infrastructure
   permalink: /ml-infrastructure
   description: Machine learning infrastructure, GPU clusters, and deployment
+
+ai-coding:
+  label: AI Coding
+  permalink: /ai-coding
+  description: AI-assisted code generation tools and their impact
+
+ci-cd:
+  label: CI/CD
+  permalink: /ci-cd
+  description: CI/CD pipeline architecture, automation, and deployment practices
+
+production-outages:
+  label: Production Outages
+  permalink: /production-outages
+  description: Production system failures and post-mortem analysis
+
+devops:
+  label: DevOps
+  permalink: /devops
+  description: DevOps engineering, infrastructure, and operational practices
