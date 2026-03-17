@@ -1,0 +1,354 @@
+---
+slug: nvidia-20-billion-groq-gpus-not-enough-inference
+title: "NVIDIA Spent $20 Billion Because GPUs Alone Can't Win the Inference Era"
+description: "NVIDIA's $20B Groq deal and the Groq 3 LPU at GTC 2026 signal a fundamental shift: GPU-only inference is no longer the optimal architecture for latency-sensitive AI workloads. Full technical breakdown with verified specs, competitive landscape, and what it means for teams renting GPUs today."
+authors: [dhaya]
+tags: [nvidia, groq, inference, gpu, lpu, gtc-2026, ai-infrastructure]
+image: /img/blog/nvidia-groq-inference.png
+keywords:
+  - NVIDIA Groq 3 LPU
+  - GTC 2026 inference
+  - GPU vs LPU inference
+  - heterogeneous AI inference
+  - NVIDIA Vera Rubin LPX
+  - Groq acquisition
+  - AI inference hardware 2026
+  - premium tokens
+  - Cerebras OpenAI
+  - GPU cloud inference
+---
+
+
+<head>
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "NVIDIA Spent $20 Billion Because GPUs Alone Can't Win the Inference Era",
+      "description": "NVIDIA's $20B Groq deal and the Groq 3 LPU at GTC 2026 signal a fundamental shift: GPU-only inference is no longer the optimal architecture for latency-sensitive AI workloads.",
+      "author": {
+        "@type": "Person",
+        "name": "Dhayabaran V",
+        "url": "https://barrack.ai"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Barrack AI",
+        "url": "https://barrack.ai"
+      },
+      "datePublished": "2026-03-17",
+      "dateModified": "2026-03-17"
+    })}
+  </script>
+</head>
+
+On March 16, 2026, Jensen Huang took the stage at GTC in San Jose and unveiled the NVIDIA Groq 3 LPU: a chip that is not a GPU, does not run CUDA natively, and exists for one reason only. Inference.
+
+Three months earlier, on Christmas Eve 2025, NVIDIA paid $20 billion in cash to license Groq's entire patent portfolio, hire roughly 90% of its employees, and acquire all of its assets. It was the largest deal in NVIDIA's history. The company that built the GPU monopoly spent $20 billion on a chip that replaces GPUs for the most latency-sensitive phase of AI inference.
+
+This is not a product announcement recap. Every major outlet has covered the Groq 3 specs. What nobody has published is the synthesis: why the GPU company needed a non-GPU chip, what the data says about GPU architectural limitations during inference decode, and what this means for the thousands of ML teams currently renting GPUs for inference workloads.
+
+Every claim in this post is sourced. NVIDIA's own projections are labeled as such. Independent benchmarks are cited separately.
+
+<!-- truncate -->
+
+---
+
+## The deal: what NVIDIA actually bought for $20 billion
+
+The transaction is structured as a non-exclusive IP licensing agreement combined with an asset purchase and acqui-hire. NVIDIA did not acquire Groq as a corporate entity. Jensen Huang stated in an internal email obtained by CNBC: "While we are adding talented employees to our ranks and licensing Groq's IP, we are not acquiring Groq as a company."
+
+What NVIDIA received:
+
+- A perpetual, non-exclusive license to Groq's entire patent portfolio, LPU technology, and software stack
+- All of Groq's physical assets. Groq investor Alex Davis confirmed to CNBC: "Nvidia is getting all of Groq's assets."
+- Roughly 90% of Groq's employees, including founder Jonathan Ross (now NVIDIA Chief Software Architect) and president Sunny Madra (now NVIDIA VP of Hardware)
+
+What NVIDIA did not acquire: the Groq corporate entity (which continues to operate under new CEO Simon Edwards, the former CFO) and GroqCloud, Groq's inference API service.
+
+The $20 billion figure was confirmed by Alex Davis, CEO of Disruptive, Groq's lead Series E investor, to CNBC. Payment was approximately 85% upfront, 10% mid-year 2026, and 5% at end of 2026, per Axios.
+
+For context: Groq's Series E closed on September 17, 2025, at a $6.9 billion valuation. NVIDIA's deal valued Groq at 2.9x that figure just three months later.
+
+The deal was announced December 24, 2025. By January 23, 2026, Sunny Madra confirmed on X that he was already working at NVIDIA.
+
+*Sources: CNBC (December 24, 2025), Axios (December 28, 2025), Groq official newsroom, NVIDIA internal email obtained by CNBC.*
+
+---
+
+## Why NVIDIA needed a non-GPU chip: the arithmetic intensity problem
+
+GPUs were designed for parallel computation at scale. Training large language models is a compute-bound workload: massive matrix-matrix multiplications (GEMM) across enormous batch sizes, with high arithmetic intensity. GPUs excel at this.
+
+Inference has a fundamentally different computational profile. It consists of two phases:
+
+**Prefill** processes the input prompt. It is compute-heavy, involves large batch GEMM operations, and has an arithmetic intensity of roughly 95 FLOP/byte. GPUs handle prefill efficiently.
+
+**Decode** generates output tokens one at a time, autoregressively. Each step requires reading the entire model's weights from memory for what is essentially a matrix-vector operation (GEMV). Decode accounts for over 95% of total inference time in production. Its arithmetic intensity drops to roughly 8 FLOP/byte.
+
+Here is the problem. The H100 GPU's hardware "ridge point," the threshold where compute fully saturates, sits at approximately 294 FLOP/byte (989 TFLOPS BF16 divided by 3.35 TB/s HBM bandwidth). Any workload below that ratio is memory-bandwidth-bound.
+
+Decode operates at 8 FLOP/byte. The GPU is designed for 294 FLOP/byte. That is a 36x mismatch. During decode, GPU compute cores are effectively idle the vast majority of the time, waiting for data to arrive from HBM.
+
+This is not theoretical. A peer-reviewed characterization study of LLM inference on GPUs (arxiv.org/pdf/2512.01644) found that during decode, FFN kernel DRAM utilization rises 62% while SM (compute) utilization drops. Organizations typically convert only 20 to 25% of paid GPU capacity into useful inference work. A 128-GPU H100 cluster running at 30% utilization wastes approximately $1.6 million per year.
+
+GPU FP64 FLOPS grew 80x from 2012 to 2022. Memory bandwidth grew only 17x over the same period. The gap continues to widen. This is the "memory wall."
+
+NVIDIA's response: buy a chip architecture that was designed from the ground up for the bandwidth-bound decode phase.
+
+*Sources: arxiv.org/pdf/2512.01644, arxiv.org/pdf/2601.05047, Clockwork GPU efficiency analysis, Modal GPU utilization guide.*
+
+---
+
+## Groq 3 LPU: verified specifications
+
+The following specifications are confirmed by NVIDIA's official tech blog (developer.nvidia.com), the NVIDIA product page (nvidia.com/en-us/data-center/lpx/), and independently corroborated by IEEE Spectrum, Tom's Hardware, and The Register.
+
+| Specification | Groq 3 LPU (LP30) | Rubin GPU | Ratio |
+|---|---|---|---|
+| Memory type | On-chip SRAM | HBM4 | Different architectures |
+| Memory capacity per chip | 500 MB | 288 GB | 576:1 GPU advantage |
+| Memory bandwidth per chip | 150 TB/s | 22 TB/s | 6.8x LPU advantage |
+| Peak compute | 1.2 PFLOPS (FP8) | 50 PFLOPS (FP4) | 42:1 GPU advantage |
+| Scale-up bandwidth per chip | 2.5 TB/s | N/A (NVLink 6 at 3.6 TB/s) | Different interconnect |
+
+The bandwidth ratio is the critical number. IEEE Spectrum confirmed: the Groq 3 LPU delivers approximately 7x the memory bandwidth of the Rubin GPU. The Register corroborated the same figure.
+
+The capacity ratio matters equally. At 500 MB per chip versus 288 GB, the LPU holds 1/576th the data. This is by design. The LPU uses SRAM as primary working storage, not cache. There is no HBM on the chip. NVIDIA's tech blog states: "a flat, SRAM-first memory architecture where 500 MB of high-speed on-chip SRAM serves as the primary working storage for inference."
+
+HBM access latency is measured in hundreds of nanoseconds per access. SRAM access is sub-nanosecond at typical clock speeds. Jensen Huang himself acknowledged this at CES 2026: "SRAM's a lot faster than going off to even HBM memories" and "For some workloads, it could be insanely fast."
+
+The Groq 3 LPU uses deterministic, compiler-orchestrated execution. There is no dynamic hardware scheduling, no branch prediction, no cache controllers, no out-of-order execution logic. The compiler pre-computes the entire execution graph, including inter-chip communication patterns, down to individual clock cycles. Every run of the same program produces identical timing behavior.
+
+Ian Buck, NVIDIA's VP of Hyperscale and HPC, described the tradeoff directly to The Register: "The LPU is optimized strictly for that extreme, low-latency token generation, offering token rates in the 1000s of tokens per second. The trade off, of course, is that you need many chips in order to perform that kind of performance."
+
+*Sources: NVIDIA developer blog, NVIDIA product page, IEEE Spectrum, The Register (Tobias Mann), Tom's Hardware, CES 2026 Q&A.*
+
+---
+
+## Groq 3 LPX rack: 256 LPUs as one system
+
+NVIDIA packages 256 Groq 3 LPUs into the Groq 3 LPX rack.
+
+| Specification | Value |
+|---|---|
+| LPUs per rack | 256 |
+| Total on-chip SRAM | 128 GB |
+| Aggregate SRAM bandwidth | ~40 PB/s |
+| Scale-up bandwidth | 640 TB/s |
+| AI inference compute (FP8) | 315 PFLOPS |
+| Physical form factor | 32 liquid-cooled 1U compute trays, 8 LPUs per tray |
+| Shipping timeline | H2 2026 |
+
+The rack connects to a Vera Rubin NVL72 GPU rack via Spectrum-X interconnect. The two racks operate as a single heterogeneous inference system.
+
+A note on an error in some reporting: Yahoo Finance and at least one other outlet state "128 LPUs" per rack. This is incorrect. They confused the 128 GB SRAM figure with the LPU count. The correct number, confirmed by NVIDIA's official tech blog Table 1 and independently by Tom's Hardware, The Register, IEEE Spectrum, and HPCwire, is 256.
+
+*Sources: NVIDIA developer blog (Table 1, Table 2), StorageReview, HPCwire, Tom's Hardware.*
+
+---
+
+## How the GPU+LPU architecture works in practice
+
+NVIDIA calls this architecture "Attention-FFN Disaggregation" (AFD). It is more nuanced than a simple "GPU does prefill, LPU does decode" split.
+
+**Phase 1: Prefill.** Handled entirely by the Vera Rubin NVL72 GPUs. The GPU ingests the input prompt, builds the KV cache, and performs the compute-heavy prompt processing. GPU strengths (massive parallel compute, large HBM capacity) are fully utilized here.
+
+**Phase 2: Decode operates as a two-engine loop.**
+
+On every output token:
+
+1. The GPU handles decode attention over the accumulated KV cache. This benefits from the GPU's large HBM capacity, which stores the growing cache.
+2. The LPU handles the latency-sensitive FFN and MoE expert execution. This is the bandwidth-bound portion where SRAM's 150 TB/s throughput provides the advantage.
+3. Intermediate activations are exchanged between GPU and LPU on every token.
+
+NVIDIA Dynamo software orchestrates this: routing prefill to GPUs, coordinating the AFD decode loop, managing KV-aware routing, and scheduling based on latency targets.
+
+Ian Buck confirmed to The Register that the Groq 3 LPU does not run CUDA natively: "There are no changes to CUDA at this time. We are leveraging the LPU as an accelerator to the CUDA that's running on the Vera NVL 72 platform."
+
+**Performance claims from NVIDIA (not independently benchmarked):**
+
+- 35x higher inference throughput per megawatt when LPX is paired with Vera Rubin NVL72, compared to GB200 NVL72 (Grace Blackwell). This is benchmarked on a specific configuration: 400 tokens per second per user, 2-trillion-parameter MoE model, 400K input context.
+- Up to 10x more revenue per watt compared to Blackwell alone.
+- Production cost of $45 per million output tokens on a 1-trillion-parameter model with 400K context, per The Register's reporting of NVIDIA's projection.
+
+For comparison: OpenAI currently charges approximately $15 per million output tokens for GPT-5.4 standard API access. The $45 figure represents what NVIDIA projects inference providers could charge for ultra-low-latency "premium tokens" generated at hundreds to thousands of tokens per second.
+
+**These figures are NVIDIA projections. No independent MLPerf results exist for Groq 3 LPU. They should be evaluated accordingly.**
+
+One additional signal worth noting: Tom's Hardware reported that Ian Buck "hinted that the Groq 3 LPU might lead to a reduced role for the Rubin CPX inference accelerator." The Register went further, stating that the Rubin CPX project "appears to have been abandoned in favor of Groq's LPU-based decode accelerators." NVIDIA's own inference GPU variant is being sidelined by a non-GPU.
+
+*Sources: NVIDIA developer blog, The Register, Tom's Hardware, HPCwire, IEEE Spectrum.*
+
+---
+
+## The competitive landscape: NVIDIA is not alone in this conclusion
+
+NVIDIA is not the only organization concluding that GPUs alone are insufficient for inference. The pattern is industry-wide.
+
+### Cerebras + OpenAI
+
+OpenAI launched GPT-5.3-Codex-Spark on Cerebras WSE-3 hardware around February 12, 2026. This is OpenAI's first production model running on non-NVIDIA silicon. It generates over 1,000 tokens per second, enabling near-instant feedback in live coding environments. The model is a smaller, text-only coding model with a 128K context window, optimized for latency-first interactive coding.
+
+OpenAI clarified: "GPUs remain foundational across our training and inference pipelines and deliver the most cost-effective tokens for broad usage. Cerebras complements that foundation by excelling at workflows that demand extremely low latency."
+
+The deal is a $10+ billion multi-year contract to deploy up to 750 megawatts of Cerebras-backed compute through 2028.
+
+Separately, on March 13, 2026, three days before GTC, Cerebras announced a multi-year partnership with AWS. AWS Trainium will handle prefill; Cerebras CS-3 will handle decode. This is the same disaggregated prefill/decode architecture that NVIDIA is building with GPU+LPU.
+
+Cerebras's WSE-3 contains approximately 900,000 cores, 44 GB of on-chip SRAM, and delivers 27 petabytes per second of internal memory bandwidth. Cerebras confidentially filed for IPO on February 23, 2026, targeting a Q2 2026 listing at a $23 billion valuation.
+
+*Sources: OpenAI blog, Cerebras blog, VentureBeat, Tom's Hardware, Reuters, BusinessWire (AWS announcement).*
+
+### SambaNova SN50
+
+SambaNova announced the SN50 RDU on February 24, 2026. It uses a Reconfigurable Dataflow Unit architecture with a three-tier memory system (SRAM + HBM + large-capacity memory), supports models up to 10 trillion parameters, and ships H2 2026.
+
+SambaNova cites a SemiAnalysis InferenceX benchmark: Llama 3.3 70B at FP8 achieves 895 tokens per second per user on SN50 versus 184 tokens per second on NVIDIA B200. That is approximately a 3x throughput advantage with latency constraints. This is a company-selected benchmark and has not been independently verified across all workloads.
+
+*Sources: BusinessWire, Tom's Hardware, EE Times.*
+
+### AMD MI350X/MI355X
+
+AMD's MI355X (CDNA 4, liquid-cooled) ships with 288 GB HBM3E at 8 TB/s bandwidth and delivers up to 10 PFLOPS MXFP4 per GPU. AMD submitted its first MLPerf Inference results (v5.1, September 2025), showing a 3.4x improvement in tokens per second on Llama 2 70B for the MI355X versus MI300X. AMD projects the MI450 "Helios" for Q3 2026, claiming 10x inference improvement for MoE models.
+
+AMD's primary constraint remains software. ROCm continues to lag CUDA in ecosystem maturity and developer adoption.
+
+*Sources: AMD official blog, MLPerf v5.1 results, Tom's Hardware.*
+
+### Etched Sohu
+
+Etched is building a transformer-only ASIC (TSMC 4nm, 144 GB HBM3E) and raised $500 million in January 2026 at approximately $5 billion valuation. The company claims its 8-chip server replaces 160 H100 GPUs and generates over 500,000 tokens per second on Llama 70B.
+
+**These claims are entirely unverified.** No independent benchmarks have been published. Technical analyses on LessWrong have raised skepticism about the claimed throughput given memory-bandwidth limitations. If the transformer architecture is superseded, the company has no architectural pivot.
+
+*Sources: Etched official, LessWrong technical analysis.*
+
+### The common thread
+
+Both NVIDIA (GPU + LPU) and AWS/Cerebras (Trainium + CS-3) are converging on the same architectural pattern: separate, specialized hardware for prefill versus decode. SambaNova's three-tier memory system addresses the same bandwidth bottleneck from a different angle. AMD is increasing HBM bandwidth generation over generation but staying within the GPU paradigm.
+
+The inference hardware market was valued at approximately $103 to $106 billion in 2025. Inference now accounts for roughly two-thirds of all AI compute spending, up from approximately half in 2025.
+
+---
+
+## What this means for teams renting GPUs today
+
+If you are currently renting H100, H200, or B200 GPUs for inference workloads, here is what the data says.
+
+**GPU-only inference is not obsolete.** GPUs remain the optimal choice for:
+
+- **Training.** No change. Training is compute-bound, not bandwidth-bound.
+- **Batch inference.** Batching multiple requests raises arithmetic intensity, pushing the workload back toward the GPU's design point.
+- **Prefill and prompt processing.** Even in the new heterogeneous architecture, GPUs handle prefill.
+- **Multimodal workloads.** Diffusion models, video generation, and image processing are compute-heavy.
+
+**GPU-only inference is increasingly suboptimal for:**
+
+- **Latency-sensitive single-user decode.** Real-time chatbots, voice AI, interactive coding assistants.
+- **Agentic AI workloads.** Agents spawn sub-agents, generating tokens exponentially. Speed bottlenecks block entire workflows.
+- **Long output sequences.** The longer the generation, the more time spent in the bandwidth-bound decode phase.
+
+**Timeline for heterogeneous systems:**
+
+- Vera Rubin NVL72 + Groq 3 LPX racks ship H2 2026 through NVIDIA's 80+ MGX partners.
+- Cloud availability through hyperscalers is expected late 2026 to early 2027.
+- GroqCloud (the independent Groq inference API) is already operational with over 1.9 million developers. It offers Llama 4 Scout at $0.11 per million input tokens and $0.34 per million output tokens.
+- Cerebras on AWS targets H2 2026.
+
+**Current GPU cloud pricing for inference (early 2026):**
+
+| GPU | On-Demand Range ($/GPU-hr) | HBM | Bandwidth |
+|---|---|---|---|
+| A100 | $1.29 to $2.29 | 80 GB | 2.0 TB/s |
+| H100 | $1.49 to $5.00 | 80 GB | 3.35 TB/s |
+| H200 | $2.50 to $10.60 | 141 GB | 4.8 TB/s |
+| B200 | ~20-30% above H200 | 192 GB | 8.0 TB/s |
+
+**Independently verified Blackwell inference performance (MLPerf):**
+
+- MLPerf v5.0 (April 2025): GB200 NVL72 delivered 800 tokens per second on Llama 3.1 405B. GB200 versus H200: 3.4x higher per-GPU performance.
+- MLPerf v5.1 (September 2025): GB300 NVL72 (Blackwell Ultra) delivered 45% higher per-GPU throughput on DeepSeek-R1 versus GB200 NVL72. Blackwell Ultra versus Hopper: approximately 5x higher throughput per GPU on DeepSeek-R1.
+
+For most ML teams today, Blackwell GPUs on pay-as-you-go cloud billing remain the best available option for inference. The heterogeneous GPU+LPU architecture will begin reaching non-hyperscaler customers in late 2026 at the earliest.
+
+*Sources: Jarvislabs, GMI Cloud, Spheron, Genesis Cloud, MLPerf v5.0 and v5.1 results.*
+
+---
+
+## The $1 trillion order book and what it signals
+
+At GTC 2026, Jensen Huang stated: "I see through 2027 at least $1 trillion" in purchase orders for Blackwell and Vera Rubin combined. The previous projection, stated in October 2025, was $500 billion. CFO Colette Kress confirmed after Q4 FY2026 earnings (February 2026) that growth would exceed the earlier estimate.
+
+NVIDIA's FY2026 financials (fiscal year ended January 25, 2026):
+
+| Metric | Amount |
+|---|---|
+| Total revenue | $215.9 billion (up 65% YoY) |
+| Data center revenue | $193.7 billion (up 68% YoY) |
+| Q4 data center revenue | $62.3 billion (up 75% YoY) |
+| Q1 FY2027 guidance | $78.0 billion (plus or minus 2%) |
+
+The $1 trillion figure is an NVIDIA projection of purchase order value, not booked revenue. It should be evaluated as a forward-looking estimate.
+
+*Sources: NVIDIA Newsroom (Q4 FY2026 earnings), Tom's Hardware GTC live blog, Axios, CNBC.*
+
+---
+
+## The strategic picture
+
+NVIDIA spent $20 billion not because GPUs are failing, but because the workload mix is shifting. During the training era, GPUs were the only game in town. During the inference era, where 75% of AI workloads are projected to be inference-based by 2027 (per Cisco analysis), the architectural requirements diverge.
+
+Training is compute-bound. GPUs win. Prefill is compute-bound. GPUs win. Decode is bandwidth-bound. GPUs, with their HBM-centric memory hierarchy designed for high-batch training, hit a fundamental architectural mismatch.
+
+Analyst Patrick Moorhead of Moor Insights summarized: "Jensen has to articulate the idea of heterogeneous computing and then how you can do it so much more easily on Nvidia."
+
+The Mellanox acquisition in 2020 gave NVIDIA networking. The Groq deal in 2025 gives NVIDIA the decode accelerator. Both follow the same strategy: own the entire data center stack so customers have no reason to look elsewhere.
+
+The inference era is here. NVIDIA's $20 billion bet is that GPU-only inference is not enough to win it.
+
+---
+
+## Frequently asked questions
+
+**Is GPU-only inference dead?**
+
+No. GPUs remain optimal for training, batch inference, prefill processing, and multimodal workloads. The shift applies specifically to latency-sensitive decode in single-user or low-batch scenarios. For most teams today, GPU-based inference on Blackwell hardware is the best available option. Heterogeneous GPU+LPU systems begin shipping H2 2026.
+
+**What is an LPU?**
+
+A Language Processing Unit. It is a chip designed exclusively for AI inference. Unlike GPUs, which use HBM (High Bandwidth Memory) and dynamic hardware scheduling, the LPU uses on-chip SRAM as primary working storage and deterministic, compiler-orchestrated execution. The result is lower latency and higher bandwidth per chip, at the cost of significantly less memory capacity.
+
+**Does the Groq 3 LPU run CUDA?**
+
+Not natively. NVIDIA VP Ian Buck confirmed: "There are no changes to CUDA at this time. We are leveraging the LPU as an accelerator to the CUDA that's running on the Vera NVL 72 platform." The LPU operates as a co-processor to the GPU, not a replacement for the CUDA ecosystem.
+
+**What are premium tokens?**
+
+Ultra-low-latency inference outputs generated at hundreds to thousands of tokens per second per user. The Register reported that NVIDIA projects inference providers could charge up to $45 per million output tokens with GPU+LPU systems. For comparison, OpenAI charges approximately $15 per million output tokens for GPT-5.4 standard API access. Premium tokens serve agentic AI, real-time voice AI, interactive coding, and other latency-critical applications.
+
+**When will GPU+LPU systems be available to rent?**
+
+Vera Rubin NVL72 + Groq 3 LPX racks ship H2 2026 through NVIDIA's MGX partners. Cloud availability through major providers is expected late 2026 to early 2027. Independently, GroqCloud is operational today with its own LPU-based inference API, and Cerebras on AWS targets H2 2026.
+
+**Should I wait to rent GPUs for inference?**
+
+For most teams, no. Blackwell B200 and B300 GPUs are available today and deliver 3.4x to 5x higher per-GPU inference throughput compared to H200 (independently verified via MLPerf v5.0 and v5.1). Pay-as-you-go billing eliminates lock-in risk. When heterogeneous systems become available, you can transition workloads that benefit from the architecture. There is no reason to pause inference work today.
+
+**Are the 35x throughput and $45/M token claims verified?**
+
+No. These are NVIDIA projections based on internal modeling for a specific configuration (400 tokens per second per user, 2-trillion-parameter MoE model, 400K input context). No independent MLPerf or third-party benchmarks exist for the Groq 3 LPU. This post labels all NVIDIA projections accordingly.
+
+**What happened to Groq as an independent company?**
+
+Groq's corporate entity continues to operate under CEO Simon Edwards (former CFO). GroqCloud remains active with over 1.9 million developers. However, NVIDIA licensed Groq's entire patent portfolio, acquired all physical assets, and hired approximately 90% of employees. The independent entity retains the brand and cloud service, but the core technology and team are now at NVIDIA.
+
+**How does the Cerebras-OpenAI deal compare?**
+
+OpenAI deployed GPT-5.3-Codex-Spark on Cerebras WSE-3 hardware in February 2026, achieving over 1,000 tokens per second for code generation. This is a $10+ billion multi-year contract. OpenAI stated that GPUs remain foundational for their pipelines, with Cerebras complementing for latency-critical workloads. The pattern is the same as NVIDIA's: specialized hardware for the decode phase, GPUs for everything else.
+
+---
+
+*Published by Barrack AI. GPU cloud infrastructure with B200 and B300 on-demand, per-minute billing, zero egress fees, zero contracts. [Learn more →](https://barrack.ai)*
+
+*This post was published on March 17, 2026. GTC 2026 runs through March 19. If material new information emerges from sessions this week, this post will be updated.*

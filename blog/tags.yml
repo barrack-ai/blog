@@ -297,15 +297,6 @@ perplexity:
   description: Perplexity AI browser and agent security research
 
 
-gtc-2026:
-  label: GTC 2026
-  permalink: /gtc-2026
-  description: NVIDIA GTC 2026 conference coverage and announcements
-
-inference:
-  label: Inference
-  permalink: /inference
-  description: AI inference optimization, cost analysis, and GPU benchmarks
 
 ml-infrastructure:
   label: ML Infrastructure
@@ -356,3 +347,34 @@ wosign:
   label: WoSign
   permalink: /wosign
   description: WoSign certificate authority history and browser distrust
+
+groq:
+  label: Groq
+  permalink: /groq
+  description: Groq LPU inference hardware
+
+lpu:
+  label: LPU
+  permalink: /lpu
+  description: Language Processing Unit
+
+
+gpu:
+  label: GPU
+  permalink: /gpu
+  description: GPU hardware and cloud compute
+
+ai-infrastructure:
+  label: AI Infrastructure
+  permalink: /ai-infrastructure
+  description: AI infrastructure and data center technology
+
+gtc-2026:
+  label: GTC 2026
+  permalink: /gtc-2026
+  description: NVIDIA GTC 2026 conference
+
+inference:
+  label: Inference
+  permalink: /inference
+  description: AI inference optimization, cost analysis, and GPU benchmarks
