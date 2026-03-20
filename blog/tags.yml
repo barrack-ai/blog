@@ -378,3 +378,28 @@ inference:
   label: Inference
   permalink: /inference
   description: AI inference optimization, cost analysis, and GPU benchmarks
+
+ios:
+  label: iOS
+  permalink: /ios
+  description: iOS security vulnerabilities and exploit analysis
+
+darksword:
+  label: DarkSword
+  permalink: /darksword
+  description: DarkSword iOS exploit kit analysis
+
+mobile-security:
+  label: Mobile Security
+  permalink: /mobile-security
+  description: Mobile device security and exploit research
+
+exploit-chain:
+  label: Exploit Chain
+  permalink: /exploit-chain
+  description: Multi-vulnerability exploit chain analysis
+
+malware:
+  label: Malware
+  permalink: /malware
+  description: Malware analysis and threat research
