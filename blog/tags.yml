@@ -403,3 +403,13 @@ malware:
   label: Malware
   permalink: /malware
   description: Malware analysis and threat research
+
+ml-pipeline:
+  label: ML Pipeline
+  permalink: /ml-pipeline
+  description: Machine learning CI/CD pipeline security and automation
+
+trivy:
+  label: Trivy
+  permalink: /trivy
+  description: Trivy vulnerability scanner incidents and supply chain security
