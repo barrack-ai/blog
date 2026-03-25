@@ -1,0 +1,146 @@
+---
+slug: nvidia-cuda-never-clears-gpu-memory
+title: "NVIDIA's CUDA Never Clears GPU Memory. Here's a Decade of Research Showing Why That Matters."
+authors: [dhaya]
+tags: [security, nvidia, cuda, gpu-memory, vram]
+image: /img/nvidia-cuda-memory-og.png
+date: 2026-03-25
+---
+# NVIDIA's CUDA Never Clears GPU Memory. Here's a Decade of Research Showing Why That Matters.
+
+NVIDIA's official CUDA documentation explicitly states that `cudaMalloc()` does not clear memory. That means every GPU memory allocation can return data left behind by a previous process. Academic researchers have been exploiting this behavior since 2014, recovering credit card numbers, rendered webpages, LLM responses, and model weights from GPU memory residues. NVIDIA's only documented fix, Confidential Computing on H100, is opt-in and requires specific hardware that most deployments don't use.
+
+This post compiles every verified source on the topic: NVIDIA's documentation, peer-reviewed research from IEEE S&P, USENIX Security, ACM CCS, active CVEs, and NVIDIA's own security bulletins. No speculation. No assumptions. Just what NVIDIA documents, what researchers have proven, and what ML engineers should know.
+
+## NVIDIA's own documentation confirms memory is not cleared
+
+The foundation of this entire issue is a single, unambiguous sentence repeated across every NVIDIA CUDA memory allocation API. The official CUDA Runtime API documentation for `cudaMalloc()` states:
+
+> "Allocates size bytes of linear memory on the device and returns in *devPtr a pointer to the allocated memory. The allocated memory is suitably aligned for any kind of variable. **The memory is not cleared.**"
+
+This identical language appears in the documentation for `cuMemAlloc`, `cudaMallocManaged`, and `cuMemAllocManaged` across both the CUDA Runtime API and CUDA Driver API. NVIDIA's own Compute Sanitizer tool includes an `--tool initcheck` mode specifically designed to detect "Uninitialized __global__ memory read" errors after `cudaMalloc`, confirming that the returned memory contains whatever data previously occupied those addresses.
+
+Beyond individual allocations, no official NVIDIA documentation guarantees that GPU memory is zeroed between processes or CUDA contexts in standard (non-Confidential Computing) operation. The CUDA C++ Best Practices Guide contains zero mention of security considerations for memory management, focusing exclusively on performance optimization. The `cudaFree()` documentation describes freeing memory but does not specify whether freed memory is zeroed before reallocation. NVIDIA Developer Forum posts corroborate this: one widely cited thread from 2018 notes "From my experience, the driver does not erase memory after it is freed. You can easily do it yourself from host code using cuda_memset()." NVIDIA staff did not correct this statement.
+
+NVIDIA's own `gpu-admin-tools` repository on GitHub includes a `--clear-memory` flag described as "Clear the contents of the GPU memory." The existence of this tool as an explicit administrative action confirms that memory clearing is not a default operation.
+
+For AMD's ROCm/HIP ecosystem, the situation is worse in terms of documentation: AMD's `hipMalloc()` documentation is entirely silent on whether allocated memory is zeroed or uninitialized. Since HIP is designed as a CUDA-compatible interface and `cudaMalloc()` explicitly does not clear memory, the documented behavior of the reference implementation points to the same outcome. AMD provides no explicit documentation either way.
+
+This stands in stark contrast to CPU memory behavior. The Linux kernel guarantees zeroed pages to userspace processes via `get_zeroed_page()` and `mmap()`, with additional hardening options like `CONFIG_INIT_ON_ALLOC_DEFAULT_ON` (since kernel v5.3) and `CONFIG_INIT_ON_FREE_DEFAULT_ON`. No documented GPU equivalent exists.
+
+## A decade of academic research proves data leaks from GPU memory
+
+The academic literature on GPU memory security is extensive, consistent, and spans over a decade. Multiple peer-reviewed papers across top-tier venues have demonstrated that GPU memory persistence is exploitable.
+
+**Lee et al. (IEEE S&P 2014)** published "Stealing Webpages Rendered on Your Browser by Exploiting GPU Vulnerabilities," the first in-depth security analysis of GPU memory. They discovered that both NVIDIA and AMD GPUs do not initialize newly allocated GPU memory pages. The researchers recovered rendered webpage textures from GPU memory residues and identified original webpages with up to 95.4% accuracy using pixel sequence matching.
+
+**Maurice et al. (Financial Cryptography 2014)** published "Confidentiality Issues on a GPU in a Virtualized Environment" and demonstrated cross-VM GPU data recovery. Their finding: GPU global memory is zeroed only in some configurations, and when it does happen, it occurs as a side effect of Error Correction Codes (ECC), not for security reasons. They explicitly warned that memory cleaning is not implemented by the GPU card itself.
+
+**Zhou et al. (PoPETs 2017)** published "Vulnerable GPU Memory Management: Towards Recovering Raw Data from GPU" and proposed an algorithm for recovering raw images directly from GPU memory residues. The researchers recovered credit card numbers, email contents, usernames, and credentials from GPU memory left by Google Chrome, Adobe PDF Reader, GIMP, and Matlab. Their conclusion: nearly all GPU-accelerated applications are vulnerable to such attacks, and adversaries can launch attacks without requiring any special privileges.
+
+**Naghibijouybari et al. (ACM CCS 2018)** published "Rendered Insecure: GPU Side Channel Attacks are Practical" and demonstrated the first general side-channel attacks on GPUs, including website fingerprinting with approximately 90% accuracy and the ability to derive internal parameters of neural network models used by other CUDA applications. This research led to CVE-2018-6260.
+
+**Pustelnik et al. (IEEE EuroS&P 2024)** published "Whispering Pixels: Exploiting Uninitialized Register Accesses in Modern GPUs" and uncovered a vulnerability class where GPU implementations lack proper register initialization before shader execution. On NVIDIA GPUs, reading from uninitialized registers reveals data previously written to GPU memory. This affects products from Apple, NVIDIA, and Qualcomm, and the researchers demonstrated leaking CNN intermediate data and LLM output reconstruction. AMD assigned CVE-2024-21969 for this issue.
+
+**Guo et al. (USENIX Security 2024)** published "GPU Memory Exploitation for Fun and Profit" and demonstrated practical code injection and code reuse attacks on modern NVIDIA GPUs (Volta and newer), including tampering with DNN model parameters persisting in GPU memory to compromise inference for future requests.
+
+
+## LeftoverLocals demonstrated real-time LLM eavesdropping
+
+The most impactful GPU memory security disclosure to date is LeftoverLocals (CVE-2023-4969), discovered by Tyler Sorensen and Heidy Khlaaf at Trail of Bits and disclosed on January 16, 2024. This vulnerability demonstrated that GPU local memory is not cleared between kernel executions, enabling a co-resident attacker to listen to another user's interactive LLM session in real time.
+
+The proof-of-concept required fewer than 10 lines of OpenCL code. On an AMD Radeon RX 7900 XT running a 7B parameter model on llama.cpp, the attack leaked approximately 5.5 MB per GPU invocation, totaling approximately 181 MB per LLM query. That is enough data to reconstruct the LLM response with high precision. The PoC code is publicly available on GitHub.
+
+LeftoverLocals affected AMD, Apple, Qualcomm, and Imagination Technologies GPUs. NVIDIA GPUs were confirmed not affected. Trail of Bits noted that NVIDIA had likely addressed these memory leak patterns due to prior academic research dating back to the CUDA Leaks paper.
+
+AMD's response was telling: they created a new operating mode designed to prevent processes from running in parallel on the GPU and to clear registers between processes on supported products. This mode is not enabled by default and needs to be set by an administrator.
+
+## Container escape vulnerabilities compound the memory risk
+
+While GPU memory persistence creates the data exposure surface, container escape vulnerabilities provide the attack path in cloud environments. Wiz Research has discovered a series of critical vulnerabilities in the NVIDIA Container Toolkit that enable complete host compromise from within a container:
+
+**CVE-2024-0132** (September 2024, CVSS 9.0): A Time-of-Check Time-of-Use (TOCTOU) vulnerability in NVIDIA Container Toolkit v1.16.1 and earlier. A specially crafted container image could escape its boundaries and gain full access to the host file system. Wiz estimated approximately 35% of cloud environments had vulnerable versions installed. Discovered by Andres Riancho, Ronen Shustin, and Shir Tamari from Wiz Research.
+
+**CVE-2025-23359** (February 2025, CVSS 9.0): The patch for CVE-2024-0132 was incomplete. Trend Micro found that the TOCTOU vulnerability persisted, enabling the same container escape attack on patched systems. Fixed in Container Toolkit v1.17.4.
+
+**CVE-2025-23266 "NVIDIAScape"** (July 2025, CVSS 9.0): A vulnerability in the Container Toolkit's `enable-cuda-compat` OCI hook, which inherited environment variables (including `LD_PRELOAD`) from container images. An attacker could craft a malicious image that, when processed by the privileged hook, loaded a rogue library outside the container, granting root access on the host. Exploitable with a 3-line Dockerfile. Per Wiz, 37% of cloud environments had vulnerable resources. Wiz stated that this vulnerability represents a systemic risk to the AI ecosystem because the NVIDIA Container Toolkit is the backbone for managed AI and GPU services across all major cloud providers.
+
+The January 2026 NVIDIA security bulletin disclosed additional memory-related vulnerabilities including CVE-2025-33220 (CVSS 7.8), a use-after-free in the vGPU Virtual GPU Manager enabling guest-to-host escape, directly threatening multi-tenant GPU virtualization environments. The same bulletin included CVE-2025-33217 (CVSS 7.8, use-after-free in Windows GPU display driver) and CVE-2025-33218 (CVSS 7.8, integer overflow in Windows kernel-mode driver). The January 2026 CUDA Toolkit bulletin added four more CVEs (CVE-2025-33228 through CVE-2025-33231), including high-severity OS command injection flaws in Nsight Systems.
+
+On the AMD side, CVE-2026-23213 (CVSS 5.5) addressed improper MMIO access handling during SMU Mode 1 reset in the Linux kernel's AMDGPU driver, creating race conditions during GPU power management transitions.
+
+## The responsibility falls on NVIDIA's driver and firmware layer
+
+The pattern across all the research above points to the same root cause: NVIDIA's GPU driver and firmware do not perform memory sanitization by default. The CUDA API does not zero memory on allocation. The driver does not zero memory on free. No documented automatic scrubbing occurs between CUDA contexts or processes in standard operation. The only documented exception is Confidential Computing mode on H100, which requires explicit opt-in at the firmware level.
+
+This means that regardless of what infrastructure a GPU runs on, whether it is a local workstation, an on-premise cluster, or any hosted environment, the default NVIDIA behavior is the same: memory is not cleared. The security posture of any GPU deployment is bounded by what NVIDIA's driver and firmware do (or don't do) at the hardware level.
+
+## MIG provides runtime isolation but not documented temporal isolation
+
+NVIDIA's Multi-Instance GPU (MIG) technology, available on Ampere architecture and newer, provides hardware-level partitioning of a single GPU into up to seven isolated instances. The MIG User Guide states that each instance's processors have separate and isolated paths through the entire memory system, including on-chip crossbar ports, L2 cache banks, memory controllers, and DRAM address busses.
+
+This provides strong runtime isolation: one MIG instance cannot access another's memory during operation.
+
+However, no MIG documentation explicitly addresses memory scrubbing when MIG instances are destroyed and recreated. The documentation notes that created MIG devices are not persistent across system reboots and requires administrators to recreate the desired MIG configurations if the GPU or system is reset. Whether that reset includes memory scrubbing is not specified. The documentation focuses entirely on runtime isolation (preventing concurrent access), not temporal isolation (clearing data between successive tenants of the same partition).
+
+Research scheduled for USENIX Security 2026 ("Behind Bars: A Side-Channel Attack on NVIDIA MIG Cache Partitioning Using Memory Barriers") and NDSS 2026 ("Exploiting TLBs in Virtualized GPUs for Cross-VM Side-Channel Attacks") indicates that even MIG's runtime isolation may have weaknesses through cache and TLB side channels.
+
+## Confidential Computing addresses the gap, but only when enabled
+
+NVIDIA's H100 Confidential Computing (CC) mode is the only documented mechanism that explicitly guarantees memory scrubbing between tenants. The official NVIDIA whitepaper ("Confidential Compute on NVIDIA Hopper H100," WP-11459-001) describes the process:
+
+A toggle operation requires a Function Level Reset (FLR) of the GPU for the mode to take effect. During this reset, a memory lock is engaged which blocks access to the GPU's memory until it has been scrubbed, mitigating cold boot attacks. GPU Firmware initiates a scrub of memory and states in registers and SRAMs before the GPU is handed over to the user.
+
+The NVIDIA developer blog confirms this occurs at both boot and tenant shutdown. An ACM Queue publication by NVIDIA engineers further states the scrubbing ensures all the states in registers and SRAMs are correctly reset before the GPU is handed to the next tenant. The scrubbing is managed by the Secure Processor (SEC2) engine on the GPU die.
+
+Three critical limitations constrain CC's practical impact:
+
+CC is opt-in and requires specific infrastructure. The host CPU must support Intel TDX, AMD SEV-SNP, or ARM CCA. The GPU must be explicitly toggled into CC-On mode. The vast majority of cloud GPU deployments do not use CC mode.
+
+HBM memory is not encrypted during computation. The whitepaper explicitly states that the on-package HBM memory is considered secure against common physical attack tools, such as interposers, and is not encrypted. Data runs in plaintext inside the GPU. The security model relies on the physical inaccessibility of on-package HBM.
+
+Memory scrubbing only occurs during FLR (GPU reset between tenants). Within a single CC session, standard CUDA allocation behavior applies. `cudaMalloc` still returns uncleared memory. CC protects against inter-tenant leakage, not intra-session memory reuse.
+
+## What lives in GPU VRAM makes the stakes concrete
+
+GPU VRAM during a typical training or inference session contains:
+
+**Model parameters** (weights and biases) persist throughout the entire session. **Optimizer states**, which for Adam includes first and second moment estimates, roughly doubling the memory footprint of the model parameters alone. **Gradients** are computed and stored during backward passes. **Activations** (intermediate layer outputs) are retained for backpropagation, often consuming the largest share of memory. **Training data batches**, which are the actual input data including tokenized text, images, or embeddings, reside in VRAM during processing. For inference, **KV caches** store attention key-value pairs for sequence generation.
+
+The Ohio Supercomputer Center documents that total training VRAM for transformer-based models with Adam optimizer in mixed precision requires approximately 40x the model parameter count in billions of bytes. A 7B parameter model consumes roughly 280 GB across its memory footprint. Every byte of this data is potentially recoverable from uncleared GPU memory.
+
+No confirmed real-world breaches exploiting GPU memory persistence in production have been publicly reported. All documented cases are researcher proof-of-concepts and coordinated vulnerability disclosures. The gap between demonstrated capability (academic PoCs recovering credit cards, emails, LLM responses, model weights) and documented protections (essentially none in standard deployments) is the core issue.
+
+## What you can do about it
+
+Based on what is documented and available today:
+
+**Zero your own VRAM.** Call `cudaMemset(ptr, 0, size)` on all allocated buffers before calling `cudaFree()`. This is not the default behavior of any ML framework. You would need to add this explicitly to your training/inference pipeline.
+
+**Use single-tenant instances for sensitive workloads.** If your workload processes proprietary models, PII, or regulated data, dedicated-host options where the physical GPU is not shared eliminate cross-tenant risk during operation.
+
+**Evaluate Confidential Computing where available.** NVIDIA's H100 Confidential Computing mode is the only option with documented firmware-level VRAM scrubbing between sessions. It comes with infrastructure requirements and cost premiums, but it is the only NVIDIA-documented solution to the memory persistence problem.
+
+**Monitor NVIDIA's security bulletins.** Three critical container escape CVEs in 18 months (CVE-2024-0132, CVE-2025-23359, CVE-2025-23266) demonstrate that timely patching of the NVIDIA Container Toolkit is not optional if you run GPU workloads in containers.
+
+**Use NVIDIA's gpu-admin-tools for manual scrubbing.** NVIDIA's `gpu-admin-tools` repository on GitHub includes a `--clear-memory` flag that explicitly clears GPU memory contents. If you manage your own GPU infrastructure, this can be integrated into your teardown process between workloads.
+
+## FAQ
+
+**Q: Is this different from how CPU memory works?**
+Yes. The Linux kernel guarantees zeroed pages to userspace processes through `mmap()` and related calls. This has been standard behavior for decades and is further hardened by kernel options like `CONFIG_INIT_ON_ALLOC_DEFAULT_ON`. No equivalent default behavior exists for GPU memory.
+
+**Q: Were NVIDIA GPUs affected by LeftoverLocals?**
+No. NVIDIA confirmed that their devices were not affected by LeftoverLocals (CVE-2023-4969). Trail of Bits noted that NVIDIA had likely addressed these memory leak patterns in their driver due to prior academic research. AMD, Apple, Qualcomm, and Imagination Technologies GPUs were affected.
+
+**Q: Does NVIDIA MIG (Multi-Instance GPU) solve this?**
+MIG provides runtime isolation between concurrent tenants on the same physical GPU. Each MIG instance has isolated memory paths, cache banks, and memory controllers. However, no MIG documentation specifies whether memory is scrubbed when MIG instances are destroyed and recreated for a new tenant. Runtime isolation and temporal isolation are different properties.
+
+**Q: What is NVIDIA Confidential Computing and does it fix the VRAM persistence issue?**
+NVIDIA's Confidential Computing mode on H100 GPUs is the only documented mechanism that performs firmware-level VRAM scrubbing between tenants. During a GPU Function Level Reset (FLR), the GPU's Secure Processor scrubs all memory and register states before handing the GPU to the next tenant. It requires specific hardware (H100+), compatible CPUs (Intel TDX, AMD SEV-SNP, or ARM CCA), and must be explicitly enabled. It is not the default GPU operating mode.
+
+**Q: Does NVIDIA's driver clear memory when a process terminates or a CUDA context is destroyed?**
+No official NVIDIA documentation guarantees this. See the first section of this post for full details on what NVIDIA's documentation does and does not specify.
+
+**Q: Should I be worried about NVIDIA's memory behavior in my ML workloads?**
+The documented risk is real but context-dependent. If you are running non-sensitive workloads (public model fine-tuning, open-source inference), the practical risk is low. If you are processing proprietary models, PII, healthcare data, financial data, or any regulated information on GPU infrastructure, NVIDIA's default behavior of not clearing memory on allocation or deallocation is a gap that warrants evaluation against your compliance and security requirements. The mitigation is straightforward: zero your own buffers with `cudaMemset` before freeing them, and evaluate Confidential Computing for workloads that require firmware-level guarantees.

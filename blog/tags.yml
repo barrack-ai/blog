@@ -423,3 +423,13 @@ rce:
   label: RCE
   permalink: /rce
   description: Remote code execution vulnerabilities
+
+cuda:
+  label: CUDA
+  permalink: /cuda
+  description: NVIDIA CUDA toolkit security and memory management
+
+vram:
+  label: VRAM
+  permalink: /vram
+  description: GPU VRAM security, memory persistence, and data leakage
