@@ -433,3 +433,13 @@ vram:
   label: VRAM
   permalink: /vram
   description: GPU VRAM security, memory persistence, and data leakage
+
+rowhammer:
+  label: Rowhammer
+  permalink: /rowhammer
+  description: Rowhammer memory attacks on CPU and GPU hardware
+
+gpu-security:
+  label: GPU Security
+  permalink: /gpu-security
+  description: GPU hardware and software security vulnerabilities
