@@ -35,7 +35,7 @@ The attack produced 8 bit-flips across 4 DRAM banks with a minimum activation co
 
 ### The impact on AI models
 
-The proof-of-concept exploit, called "Terminal Brain Damage," demonstrated that flipping the most significant bit of the exponent in FP16 model weights can degrade AI model accuracy from approximately 80% to 0.1% with a single bit flip. Five pretrained ImageNet models were tested: AlexNet, VGG16, ResNet50, DenseNet161, and InceptionV3. All dropped below 1% accuracy under the attack.
+The GPUHammer researchers used their real Rowhammer bit-flips to execute an accuracy degradation attack on DNN models stored in GPU memory. The attack methodology follows "Terminal Brain Damage" (TBD), a 2019 paper by Sanghyun Hong et al. that theoretically demonstrated how a single bit-flip in the most significant bit of the exponent in DNN weights could destroy model accuracy. TBD simulated this on CPUs. GPUHammer proved it works on real GPU hardware for the first time. Five pretrained ImageNet models were tested on the A6000: AlexNet, VGG16, ResNet50, DenseNet161, and InceptionV3. A single Rowhammer-induced bit-flip degraded accuracy by 56 to 80 percentage points across the five models. The University of Toronto researchers described the worst case as a drop from approximately 80% to 0.1%.
 
 The threat model assumes a multi-tenant cloud setting where attacker and victim are co-located on the same GPU, executing CUDA kernels in time-multiplexed fashion. NVIDIA GPU schedulers default to 250ms time slices (approximately 10 refresh intervals), providing sufficient window for the attack. Only user-level CUDA privileges are required.
 
