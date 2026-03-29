@@ -1,5 +1,5 @@
 ---
-slug: b300-1400w-power-crisis
+slug: nvidia-b300-1400w-data-center-requirements
 title: "B300 Draws 1,400W Per GPU. Most Data Centers Aren't Ready."
 description: "NVIDIA's B300 Blackwell Ultra GPU draws up to 1,400W per chip, requires mandatory liquid cooling, and demands 132-140 kW per rack. Only 1% of data centers worldwide can support this. Here's what that means for anyone building or renting AI compute infrastructure."
 authors: [dhaya]
