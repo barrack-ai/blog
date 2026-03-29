@@ -443,3 +443,13 @@ gpu-security:
   label: GPU Security
   permalink: /gpu-security
   description: GPU hardware and software security vulnerabilities
+
+data-centers:
+  label: Data Centers
+  permalink: /data-centers
+  description: Data center infrastructure, power delivery, and cooling systems
+
+liquid-cooling:
+  label: Liquid Cooling
+  permalink: /liquid-cooling
+  description: Direct-to-chip liquid cooling for GPU data center infrastructure
