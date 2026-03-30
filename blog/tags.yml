@@ -453,3 +453,23 @@ liquid-cooling:
   label: Liquid Cooling
   permalink: /liquid-cooling
   description: Direct-to-chip liquid cooling for GPU data center infrastructure
+
+openai:
+  label: OpenAI
+  permalink: /openai
+  description: OpenAI product security and vulnerability research
+
+codex:
+  label: Codex
+  permalink: /codex
+  description: OpenAI Codex coding agent security
+
+github:
+  label: GitHub
+  permalink: /github
+  description: GitHub security incidents and supply chain attacks
+
+command-injection:
+  label: Command Injection
+  permalink: /command-injection
+  description: Command injection vulnerabilities and shell escape attacks
