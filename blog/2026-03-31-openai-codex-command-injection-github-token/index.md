@@ -36,7 +36,7 @@ The task output in the Codex web portal returned the **cleartext GitHub OAuth to
 
 An attacker could then use this token to authenticate to GitHub as the victim, with whatever repository permissions that user holds. As Kinnaird McQuade, Chief Security Architect at BeyondTrust, [stated](https://thehackernews.com/2026/03/openai-patches-chatgpt-data.html): **"This granted lateral movement and read/write access to a victim's entire codebase."**
 
-## The ${IFS} bypass: getting shell commands past GitHub's branch naming rules
+## The `${IFS}` bypass: getting shell commands past GitHub's branch naming rules
 
 GitHub blocks literal spaces in branch names. That would normally prevent multi-word shell commands from appearing in a branch ref. But Bash has `${IFS}`.
 
@@ -151,7 +151,7 @@ The ChatGPT Codex Connector requests read and write access to repositories, work
 **Q: How did the Unicode obfuscation work?**
 94 Ideographic Space characters (Unicode U+3000) were appended after the word "main" in the branch name. These characters pushed the malicious payload beyond the visible area of the branch selector in the Codex UI, making the branch appear as just "main."
 
-**Q: What is ${IFS} and why did it bypass GitHub's restrictions?**
+**Q: What is `${IFS}` and why did it bypass GitHub's restrictions?**
 `${IFS}` is Bash's Internal Field Separator variable, which defaults to a space. GitHub blocks literal spaces in branch names but does not block `${IFS}`, because it appears as a valid sequence of alphanumeric characters and symbols. At shell runtime, it evaluates to a space, allowing multi-word commands to execute.
 
 **Q: Was the @codex code review path also patched?**
