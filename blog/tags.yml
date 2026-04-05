@@ -473,3 +473,13 @@ command-injection:
   label: Command Injection
   permalink: /command-injection
   description: Command injection vulnerabilities and shell escape attacks
+
+vera-rubin:
+  label: Vera Rubin
+  permalink: /vera-rubin
+  description: NVIDIA Vera Rubin GPU platform security and architecture
+
+confidential-computing:
+  label: Confidential Computing
+  permalink: /confidential-computing
+  description: Hardware-based trusted execution environments for GPU workloads
