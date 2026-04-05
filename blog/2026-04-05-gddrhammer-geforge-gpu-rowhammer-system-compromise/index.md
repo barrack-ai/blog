@@ -1,7 +1,7 @@
 ---
 title: "GDDRHammer and GeForge: GPU Rowhammer Now Achieves Full System Compromise"
 description: "Two new attacks escalate GDDR6 GPU memory bit flips into root shell access. RTX A6000 and RTX 3060 confirmed vulnerable. What GPU cloud operators need to know."
-slug: gddrhammer-geforge-gpu-rowhammer-system-compromise
+slug: gddrhammer-geforge-gpu-rowhammer-gddr6
 date: 2026-04-05
 authors: [dhaya]
 tags: [nvidia, gpu-security, rowhammer, ai-infrastructure]
