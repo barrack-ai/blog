@@ -483,3 +483,28 @@ confidential-computing:
   label: Confidential Computing
   permalink: /confidential-computing
   description: Hardware-based trusted execution environments for GPU workloads
+
+fractional-gpu:
+  label: Fractional GPU
+  permalink: /fractional-gpu
+  description: Posts about fractional GPU security and multi-tenant infrastructure
+
+multi-tenant:
+  label: Multi-Tenant
+  permalink: /multi-tenant
+  description: Posts about multi-tenant GPU infrastructure and isolation
+
+mig:
+  label: MIG
+  permalink: /mig
+  description: Posts about NVIDIA Multi-Instance GPU
+
+mps:
+  label: MPS
+  permalink: /mps
+  description: Posts about NVIDIA Multi-Process Service
+
+vgpu:
+  label: vGPU
+  permalink: /vgpu
+  description: Posts about NVIDIA vGPU virtualization
