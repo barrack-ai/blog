@@ -508,3 +508,13 @@ vgpu:
   label: vGPU
   permalink: /vgpu
   description: Posts about NVIDIA vGPU virtualization
+
+google-cloud:
+  label: Google Cloud
+  permalink: /google-cloud
+  description: Google Cloud Platform infrastructure and GPU security analysis
+
+google-cloud:
+  label: Google Cloud
+  permalink: /google-cloud
+  description: Google Cloud Platform infrastructure and GPU security analysis
