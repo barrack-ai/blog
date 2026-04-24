@@ -519,9 +519,6 @@ sandbox-escape:
   label: Sandbox Escape
   permalink: /sandbox-escape
 
-cve:
-  label: CVE
-  permalink: /cve
 
 pyodide:
   label: Pyodide

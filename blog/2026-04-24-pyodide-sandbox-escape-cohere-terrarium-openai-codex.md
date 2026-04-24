@@ -3,7 +3,7 @@ slug: pyodide-sandbox-escape-cohere-terrarium-openai-codex
 title: "AI labs keep shipping broken code sandboxes"
 description: "Cohere Terrarium (CVE-2026-5752) and OpenAI Codex CLI (CVE-2025-59532) are two instances of the same industry-wide failure: sandboxes built to contain LLM-generated code that can't actually contain it. A cross-CVE breakdown, the Pyodide architecture problem underneath, and why CERT couldn't get Cohere to answer the phone for 61 days."
 authors: [dhaya]
-tags: [security, ai-security, sandbox-escape, cve, pyodide, cohere, openai, vulnerability-research]
+tags: [security, ai-security, sandbox-escape, CVE, pyodide, cohere, openai, vulnerability-research]
 date: 2026-04-24
 ---
 
