@@ -514,3 +514,23 @@ google-cloud:
   permalink: /google-cloud
   description: Google Cloud Platform infrastructure and GPU security analysis
 
+
+sandbox-escape:
+  label: Sandbox Escape
+  permalink: /sandbox-escape
+
+cve:
+  label: CVE
+  permalink: /cve
+
+pyodide:
+  label: Pyodide
+  permalink: /pyodide
+
+cohere:
+  label: Cohere
+  permalink: /cohere
+
+vulnerability-research:
+  label: Vulnerability Research
+  permalink: /vulnerability-research
