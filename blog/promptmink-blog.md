@@ -1,0 +1,175 @@
+---
+title: "PromptMink: How North Korea Tricked Claude Into Installing npm Malware"
+description: "Famous Chollima spent seven months building malicious npm packages specifically designed to fool Claude, Copilot, and Gemini CLI. ReversingLabs calls it LLM Optimization abuse. Here is how the attack works, what it steals, and why your AI agent cannot tell the difference."
+slug: promptmink-north-korea-claude-npm-malware
+authors: [dhayabaran]
+tags: [cybersecurity, supply-chain, npm, ai-security, north-korea, famous-chollima, AI-agents, vibe-coding]
+image: /img/blog/promptmink-og.png
+---
+
+On February 28, 2026, a commit landed on an open source Solana trading bot called openpaw-graveyard. The commit added one dependency: `@solana-launchpad/sdk`. Anthropic's Claude Opus was listed as co-author. The dependency looked clean. The README was polished. The TypeScript types were correct. The package did what it said it did.
+
+It also pulled in `@validate-sdk/v2`, a North Korean credential stealer that had been sitting on npm since October 2025.
+
+ReversingLabs disclosed the campaign on April 29, 2026, under the name **PromptMink**. They attributed it to Famous Chollima, the DPRK state-sponsored group behind the Contagious Interview operation and years of crypto-targeted supply chain attacks. But PromptMink is not just another supply chain compromise. It is the first documented campaign engineered specifically to deceive AI coding agents rather than human developers. ReversingLabs gave the technique a name: **LLM Optimization (LLMO) abuse**.
+
+Famous Chollima spent seven months on this. 60+ packages. 300+ versions. Four distinct payload architectures. 20+ pieces of C2 infrastructure. And the core insight driving the entire operation is uncomfortable: if your AI coding agent picks dependencies based on documentation quality and semantic fit, you can game that selection process the same way people game Google search results. Except the stakes are SSH keys, API tokens, and crypto wallets.
+
+## How the two-layer architecture works
+
+The reason PromptMink survived multiple npm takedowns is its topology. Famous Chollima split the operation into two independent layers.
+
+**Layer 1** is a set of polished, legitimate-looking Web3 utility packages. `@solana-launchpad/sdk`, `@meme-sdk/trade`, `@validate-ethereum-address/core`, `@solmasterv3/solana-metadata-sdk`, `@pumpfun-ipfs/sdk`, `@solana-ipfs/sdk`. None of them contain a single line of malicious code. Their `package.json` files list genuinely popular dependencies like axios and bn.js (combined download counts in the billions) alongside one or two niche packages that are the actual payload.
+
+**Layer 2** is the disposable stealer. `@validate-sdk/v2`, the older `@hash-validator/v2`, and several siblings. These are the packages that do the damage.
+
+Here is why this architecture matters. On October 7, 2025, npm removed `@hash-validator/v2` and three sister packages. Within hours, Famous Chollima republished byte-identical code as `@validate-sdk/v2`, starting at version 1.22.11 (the next sequential version after the takedown), and pushed a new release of `@solana-launchpad/sdk` swapping the dependency pointer. Layer 1 kept every accumulated download count, every reputation signal, every star. Layer 2 was treated as expendable ammunition.
+
+When JFrog published partial coverage of the campaign on November 20, 2025, the attackers replaced burned dependencies the same day. No downtime. No loss of operational continuity.
+
+## The Claude commit and what it actually shows
+
+The openpaw-graveyard incident was a real compromise, not a lab demonstration. The repository `ExpertVagabond/openpaw-graveyard` is an autonomous Solana trading agent built by Purple Squirrel Media for a Solana hackathon. The commit (`cd3c6ccbfe02a0fcf249fdcf67fd3ec351a7ed7c`) added `@solana-launchpad/sdk` and carried the `Co-Authored-By: Claude <noreply@anthropic.com>` trailer that Claude Code automatically inserts on every commit it produces.
+
+No prompt injection. No jailbreak. No model exploit. Claude did what it was asked to do. It found a package that matched the task, evaluated it, and added it. The package looked legitimate because Famous Chollima designed it to look legitimate.
+
+ReversingLabs put it directly: Famous Chollima's malicious packages have been "more successful in tricking LLM coding agents than humans to use them."
+
+There is an earlier indicator that this was already working. In January 2026, an autonomous LLM agent named Zora posted on Moltbook that it had launched a memecoin and pulled in `@solana-launchpad/sdk` because "it had a function it needed." That is agent-to-agent recommendation propagation. One AI suggesting a malicious package, another AI installing it, no human in the loop at any point.
+
+## Why AI agents are easier to fool than humans
+
+A human developer does things an LLM cannot. We check the npm publisher page. We look at how many other packages the maintainer has. We notice when a package has 12 downloads and was published last week. We check the GitHub repo and see if the commit history looks organic. We get suspicious when documentation quality is disproportionately high relative to community adoption.
+
+AI coding agents weigh different signals. They care about documentation quality, semantic fit to the task, TypeScript type coverage, and how well the README describes the exact problem they are trying to solve. Famous Chollima optimized for all of these. Layer 1 READMEs read like polished SDK documentation with realistic Solana use cases (IPFS uploads, metadata management, Jito bundle execution, Pump.fun launches, Polymarket on-chain trading). They include TypeScript types, badges, and feature comparisons.
+
+The second mechanism is binary opacity. LLMs can read JavaScript and TypeScript source files cheaply. They cannot meaningfully audit Node.js Single Executable Application bundles or NAPI-RS Rust addons. ReversingLabs is explicit: the format pivots were deliberate. "Stealth is achieved by hiding malicious code from the files that LLMs can easily parse." When an agent reads `@validate-sdk/v2`, all it sees is a thin loader stub that spawns a precompiled binary. Nothing to flag.
+
+The third mechanism is the one that should keep you up at night. Famous Chollima can install Claude Code, Cursor, Gemini CLI, or Copilot themselves, ask each to build a Solana trading bot, and tune the README until the malicious package consistently surfaces in recommendations. They can A/B test their lure against your exact defensive tooling before deploying it.
+
+## The malware itself was vibe-coded
+
+ReversingLabs named the family PromptMink "due to the persistent vibe coding of both the lure and malicious packages." The evidence is concrete.
+
+An early `@validate-sdk/v2` README contained a leftover assistant prompt the operator forgot to delete: "also obfuscate the README a bit?" A test package (`pino-pretty-logger` v1.0.4) shipped unobfuscated TypeScript declarations describing the entire stealer interface in verbose JSDoc. The Rust NAPI-RS module first tested in `@slackgram/logger` was "verbosely commented in an LLM-like manner." The error handling in `@validate-sdk/v2` v1.22.30 resembles "the kind of informative messaging commonly written by LLMs (but not as often by human developers)."
+
+A PyPI cousin called `scraper-npm` (1.0.4, published February 23, 2026, two days before its npm twin) carries the same well-commented, multi-language polish. This is consistent with handing the same specification to an LLM with different language targets.
+
+PromptMink was not a fork of older DPRK malware. ReversingLabs states it explicitly: "PromptMink didn't directly inherit malicious functionality previously seen in OtterCookie and InvisibleFerret, it was developed from the ground up by generating malicious code using LLMs."
+
+## Four phases of payload evolution
+
+The malware went through four distinct technical phases. Each pivot responded to either a detection event or a capability requirement.
+
+**Phase 1 (September 2025 to January 2026):** LLM-obfuscated JavaScript stealer. Base64-encoded C2 URL pointing to `ipfs-url-validator.vercel.app/fetchbs58`. Recursive `.env` and `.json` file walker. Exfiltration over HTTPS POST.
+
+**Phase 2 (February 23, 2026):** PyPI port. The `scraper-npm` package on PyPI reimplemented the same stealer in Python with the first SSH-key persistence capability. Published two days before the npm twin. Same LLM-generated code patterns.
+
+**Phase 3 (February 28, 2026):** Node.js SEA (Single Executable Application) bundles. The payload size jumped from 5.1 KB to approximately 85 MB because the entire Node.js runtime is bundled with the script. Cross-OS ELF/PE blobs. Loaders (`loader.mjs` and `loader.cjs`) choose the OS-specific binary, spawn it as a child process, wire up I/O, and re-export wrapper functions so the package still looks like a normal Node module to an LLM reader. ReversingLabs notes: "The only reason for use of SEA as payload in this case is detection evasion."
+
+**Phase 4 (March 17 to March 24, 2026):** NAPI-RS Rust native addons. Solved the 85 MB problem. NAPI-RS produces precompiled Rust addons that present as ordinary `.node` files. Version 1.22.30 of `@validate-sdk/v2` (released March 24, 2026) added Windows SSH-key drop, in-memory project zipping, and full source-code exfiltration to the C2 domain `validator[.]uno`.
+
+## What gets stolen
+
+The capability set is cumulative across all four phases. PromptMink scans `/home` on Linux, all drives on Windows, and `/Users` on macOS. It harvests `.env` files, `.json` configuration files, and any file with a crypto-related name (with a hardcoded exclusion list to avoid massive auto-generated directories). It collects basic system fingerprinting: OS, public and local IP, username.
+
+Everything ships over HTTPS POST to three C2 endpoints: `/api/validate/files`, `/api/validate/project-env`, and `/api/validate/system-info`.
+
+Initial exfiltration ran to `ipfs-url-validator.vercel.app/fetchbs58`. From `@validate-sdk/v2` v1.22.15 onward (November 26, 2025) it shifted to `validator[.]uno`.
+
+SSH backdooring appeared in v1.22.27 (mid-March 2026) for Linux and v1.22.30 for Windows. On Linux the attacker's public key is appended to `~/.ssh/authorized_keys`. On Windows it drops into `C:\Users\{USERNAME}\.ssh`. The Rust phase added in-memory compression and exfiltration of entire project source trees. Not just secrets. Your code.
+
+## IOCs
+
+**C2 Domains:** `validator[.]uno`, `ipfs-url-validator.vercel.app`, `mywalletsss.store`, `ghostraper.top`, `polymarket-clob.com`, `clob-polymarket.com`, `winstonjs.site`, `navigatorshub.com`
+
+**C2 IPs:** `45.61.161.146`, `45.8.22.144`, `45.8.22.52`
+
+**Malicious npm packages (partial list):**
+- Layer 2 stealers: `@validate-sdk/v2`, `@hash-validator/v2`
+- Layer 1 bait: `@solana-launchpad/sdk`, `@meme-sdk/trade`, `@validate-ethereum-address/core`, `@solmasterv3/solana-metadata-sdk`, `@pumpfun-ipfs/sdk`, `@solana-ipfs/sdk`
+- Typosquats: `@mgcrae/pino-pretty-logger`, `@logcore/pino-pretty-logger`, `@logforge/pino-pretty-logger`, `@buglab/pino-pretty-logger`, `@keydev/pino-pretty-logger`, `@magcd/pino-pretty-logger`, `jellyfi-pino-pretty-logger`
+- PyPI: `scraper-npm`
+- Test packages: `pino-pretty-logger`, `@slackgram/logger`
+
+**Exfiltration endpoints:** `/api/validate/files`, `/api/validate/project-env`, `/api/validate/system-info`
+
+ReversingLabs publishes SHA-1 hashes for every package@version artifact in their full disclosure.
+
+## This is part of something bigger
+
+PromptMink is one campaign inside a coordinated DPRK push against the developer ecosystem that has been running since at least mid-2024.
+
+Famous Chollima (also tracked as Void Dokkaebi by Trend Micro, PurpleBravo by Recorded Future, Shifty Corsair by BlueVoyant, UNC5342, Storm-1877, and DEV#POPPER) runs the Contagious Interview campaign that lures developers through fake recruiter outreach into installing malware via "technical assessments." Trend Micro's analysis from late March 2026 found 750+ infected public repositories and 500+ malicious `.vscode/tasks.json` configurations exploiting the `runOn: folderOpen` directive. Affected projects reportedly included repositories at DataStax and Neutralinojs.
+
+A separate DPRK cluster, STARDUST CHOLLIMA (CrowdStrike designation), compromised the Axios npm package on March 31, 2026, pushing version 1.14.1 with ZshBucket payloads spanning Linux, macOS, and Windows. Axios is downloaded over 100,000 times per week. CrowdStrike attributes this to STARDUST CHOLLIMA rather than Famous Chollima, with materially higher malware sophistication, but flags shared infrastructure and BlueNoroff lineage.
+
+The financial context: Chainalysis reported $2.02 billion in cryptocurrency stolen by DPRK actors in 2025, a 51% year-over-year increase and 76% of all service compromises that year. The FBI attributed the $1.5 billion Bybit hack to TraderTraitor (yet another DPRK cluster).
+
+## What to do right now
+
+If you are running AI coding agents in your workflow, here is what matters.
+
+**Treat AI-introduced dependencies as privileged changes.** Any commit that adds a new dependency and carries `Co-Authored-By: Claude` or an equivalent AI trailer needs human review. Not optional. Inspect the `resolved` field of `package-lock.json` for non-registry sources. Late-stage PromptMink variants started hosting payloads as GitHub release artifacts to evade npm scanners.
+
+**Run binary analysis on every dependency, transitively.** PromptMink's pivot to SEA bundles and NAPI-RS Rust addons was specifically engineered to defeat LLM-based source review. Tools like ReversingLabs Spectra Assure, Socket, Snyk, and Phylum operate at the binary and behavioral level rather than the source level.
+
+**Sandbox your AI agent execution.** Run Claude Code, Cursor, and similar tools in microVMs (Firecracker, Kata) or system containers. Apply egress allowlists that block traffic to first-time-seen network destinations. Do not inherit full `.env` files, AWS credentials, or SSH keys into agent sessions.
+
+**Flip the README heuristic.** A polished README on a low-download, recently-published package with a sparse maintainer history is now a suspicion signal, not a positive one. Famous Chollima inverted the assumption that better documentation correlates with better software.
+
+**Consider agent-side threat intel feeds.** ReversingLabs published a Spectra Assure Community MCP server (`reversinglabs/rl-mcp-community` on Docker Hub) and Claude Code skills (`reversinglabs/rl-protect-skills` on GitHub, MIT-licensed) that plug package verdicts directly into Claude Code, Cursor, or Gemini CLI sessions. Their proof-of-concept shows Gemini CLI refusing to install `@solana-launchpad/sdk` once the MCP server is attached.
+
+## What has not happened
+
+Anthropic has issued no public statement specifically addressing PromptMink. No blog post. No incident note. Claude Opus is named on the malicious commit. The closest precedents are Anthropic's August 2025 Threat Intelligence Report (which addressed DPRK IT-worker fraud) and the November 2025 GTG-1002 disclosure of a Chinese state-linked actor abusing Claude Code. PromptMink fits neither template cleanly because there was no jailbreak, no abuse of a Claude account. The agent was doing its job with a poisoned dependency catalog.
+
+npm has not published a security advisory for `@validate-sdk/v2`, `@solana-launchpad/sdk`, or any of the 60+ identified packages. Takedowns have happened, but the registry's response loop is measured in weeks while Famous Chollima's republish loop is measured in hours.
+
+Purple Squirrel Media has not commented on the openpaw-graveyard incident.
+
+## The uncomfortable takeaway
+
+Software supply chain security has historically modeled attackers and defenders as humans, with AI as a tool used by either side. PromptMink shows what happens when the attacker treats the AI itself as the target audience. When the README is written for an LLM's retrieval ranker. When the binary blobs are placed where an LLM cannot read them. When the lure can be A/B tested against the defender's exact agent before deployment.
+
+ReversingLabs tracked 60+ packages, 300+ versions, and four payload architectures across seven months of iteration. This was not opportunistic. This was a funded, patient operation that treated AI coding agents as a new attack surface and optimized for it systematically.
+
+The Claude Opus commit on openpaw-graveyard was small. The category it opened is not.
+
+---
+
+## FAQ
+
+**What is PromptMink?**
+PromptMink is a supply chain attack campaign attributed to Famous Chollima, a North Korean state-sponsored threat group. It uses malicious npm packages specifically designed to deceive AI coding agents like Claude Code, Cursor, and Gemini CLI into installing credential-stealing malware. ReversingLabs disclosed the campaign on April 29, 2026.
+
+**What is LLMO (LLM Optimization) abuse?**
+LLMO is the technique of optimizing malicious package documentation, README files, TypeScript types, and semantic structure specifically to rank higher in AI coding agent recommendations. Famous Chollima writes better documentation for their malicious packages than most legitimate packages have, because the target audience is an LLM's retrieval and recommendation system rather than a human developer.
+
+**Was Claude hacked or jailbroken?**
+No. There was no prompt injection, no jailbreak, and no model exploit. Claude Opus evaluated `@solana-launchpad/sdk` as a legitimate package because it was designed to look legitimate. The attack was through Claude, not against Claude. The agent made the same mistake a human developer could make, but AI agents are more susceptible because they weigh documentation quality more heavily and cannot audit compiled binaries.
+
+**What does PromptMink steal?**
+PromptMink harvests `.env` files, `.json` configuration files, cryptocurrency wallet credentials, SSH keys, system information (OS, IP, username), and in its latest Rust-based variant, entire project source code trees. It exfiltrates data over HTTPS POST to attacker-controlled servers.
+
+**How does the two-layer package architecture work?**
+Layer 1 consists of clean, legitimate-looking packages (like `@solana-launchpad/sdk`) that contain no malicious code. They list Layer 2 packages (like `@validate-sdk/v2`) as dependencies. When a developer or AI agent installs the Layer 1 bait package, the Layer 2 payload installs automatically. If Layer 2 gets removed from npm, the attackers republish it under a new name and update Layer 1's dependency pointer. Layer 1 retains all its accumulated trust signals.
+
+**How many packages are involved?**
+ReversingLabs tracked more than 60 packages and over 300 versions tied to the campaign across a seven-month period from October 2025 to April 2026.
+
+**Is this connected to the Axios npm compromise?**
+The Axios compromise (March 31, 2026) was attributed by CrowdStrike to STARDUST CHOLLIMA, a different DPRK cluster. Both groups share the BlueNoroff lineage and infrastructure overlap, but PromptMink and the Axios attack are tracked as separate operations by different threat actors within the broader DPRK ecosystem.
+
+**Has Anthropic responded?**
+As of April 30, 2026, Anthropic has not issued a public statement specifically addressing the PromptMink campaign, despite Claude Opus being listed as co-author on the malicious commit.
+
+**How do I check if I am affected?**
+Search your `package.json` and `package-lock.json` files for any of the packages listed in the IOC section above. Check network logs for connections to `validator[.]uno`, `ipfs-url-validator.vercel.app`, or the C2 IPs (`45.61.161.146`, `45.8.22.144`, `45.8.22.52`). Check `~/.ssh/authorized_keys` on Linux and `C:\Users\{USERNAME}\.ssh` on Windows for unauthorized SSH public keys.
+
+**What defensive tools exist specifically for this threat?**
+ReversingLabs published a Spectra Assure Community MCP server (`reversinglabs/rl-mcp-community` on Docker Hub) and Claude Code skills (`reversinglabs/rl-protect-skills` on GitHub, MIT-licensed) that provide package verdicts directly inside AI coding agent sessions. Socket, Snyk, and Phylum also provide binary-level dependency analysis that can detect the compiled payloads PromptMink uses to evade source-level review.
+
+---
+
+*Sources: [ReversingLabs](https://www.reversinglabs.com/blog/claude-promptmink-malware-crypto), [The Hacker News](https://thehackernews.com/2026/04/new-wave-of-dprk-attacks-uses-ai.html), [CrowdStrike](https://www.crowdstrike.com/en-us/blog/stardust-chollima-likely-compromises-axios-npm-package/), [Trend Micro](https://www.trendmicro.com/en_us/research/26/d/void-dokkaebi-uses-fake-job-interview-lure-to-spread-malware-via-code-repositories.html), [Infosecurity Magazine](https://www.infosecurity-magazine.com/news/ai-npm-dependency-targets-crypto/), [Cyber Security News](https://cybersecuritynews.com/claude-generated-commit-adds-promptmink-malware/)*
